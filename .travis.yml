@@ -1,0 +1,16 @@
+addons:
+    postgresql: "9.3"
+
+language: python
+
+python:
+    - "2.7"
+
+env:
+    - DJANGO=Django==1.6.8
+
+install:
+    - pip install -q $DJANGO --use-mirrors
+    - pip install -r requirements.pip --use-mirrors
+
+script: python setup.py test
