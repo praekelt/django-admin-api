@@ -1,0 +1,6 @@
+include LICENSE
+include README.rst
+include AUTHORS.rst
+include CHANGELOG.rst
+
+recursive-include adminapi *
