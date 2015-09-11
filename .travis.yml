@@ -7,7 +7,6 @@ env:
     - DJANGO=Django==1.6.8
 
 install:
-    # Travis seems to have pip 6.x
-    - pip install django=1.6.11
+    - pip install django==1.6.11
 
 script: python setup.py test
