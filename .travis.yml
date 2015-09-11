@@ -7,7 +7,6 @@ env:
     - DJANGO=Django==1.6.8
 
 install:
-    - pip install -q $DJANGO --use-mirrors
-    - pip install -r requirements.pip --use-mirrors
+    - pip install -q $DJANGO --index-url
 
 script: python setup.py test
