@@ -31,7 +31,7 @@ class LoginTest(TestCase):
         request = self.factory.post('/login/',
             {'Authorization': 'null:empty'}
         )
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 203)
         self.assertJSONEqual(str(response.content, encoding='utf8'),
             {'detail': 'Invalid username/password.'}
         )
