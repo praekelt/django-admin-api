@@ -12,6 +12,7 @@ from adminapi.serializers import UserSerializer
 
 # TODO Either remove or add permission
 class UserListView(generics.ListAPIView):
+    permission_classes = (IsAdminUser,)
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
