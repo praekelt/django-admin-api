@@ -8,5 +8,7 @@ env:
 
 install:
     - pip install django==1.6.11
+    - pip install djangorestframework
 
-script: python setup.py test
+script:
+    - python setup.py test

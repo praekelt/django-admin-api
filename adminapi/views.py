@@ -24,7 +24,8 @@ class LoginView(APIView):
         user = request.user
         token, created = Token.objects.get_or_create(user=user)
         #TODO Remove username, for dev purposes only
-        return Response({'detail': 'Credentials Validated', 'token': token.key, 'username': request.user.username})
+        return Response({'detail': 'Credentials Validated', 'token': token.key,
+            'username': request.user.username})
 
 
 class TestView(APIView):

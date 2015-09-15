@@ -7,5 +7,6 @@ class IsStaffOrTargetUser(permissions.BasePermission):
         return view.action == 'retrieve' or request.user.is_staff
 
     def has_object_permission(self, request, view, obj):
-        # STAFF can view all records, users can view logged in session user details
+        # STAFF can view all records, users can view
+        # logged in session user details
         return request.user.is_staff or obj == request.user
