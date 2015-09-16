@@ -1,6 +1,7 @@
 from rest_framework import permissions
 
-#TODO Permissions naot used at this time
+
+# TODO Permissions naot used at this time
 class IsStaffOrTargetUser(permissions.BasePermission):
     def has_permission(self, request, view):
         # STAFF users can view user list
