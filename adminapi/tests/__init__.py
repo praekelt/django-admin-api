@@ -21,7 +21,7 @@ class LoginTest(TestCase):
 
     def login_success(self):
         request = self.factory.post(
-            '/login/',
+            '/login-auth/',
             {'Authorization': 'tester:test1pss'}
         )
         self.assertEqual(response.status_code, 200)
@@ -32,7 +32,7 @@ class LoginTest(TestCase):
 
     def login_fail(self):
         request = self.factory.post(
-            '/login/',
+            '/login-auth/',
             {'Authorization': 'null:empty'}
         )
         self.assertEqual(response.status_code, 403)
