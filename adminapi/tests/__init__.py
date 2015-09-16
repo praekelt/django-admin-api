@@ -26,7 +26,7 @@ class LoginTest(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(
-            str(response.content, encoding='utf8'),
+            response_content,
             {'detail': 'Credentials Validated'}
         )
 
@@ -37,6 +37,6 @@ class LoginTest(TestCase):
         )
         self.assertEqual(response.status_code, 403)
         self.assertJSONEqual(
-            str(response.content, encoding='utf8'),
+            response_content,
             {'detail': 'Invalid username/password.'}
         )
