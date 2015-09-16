@@ -1,0 +1,7 @@
+{% extends "base_inner.html" %}
+
+    {% block content %}
+        {% load static from staticfiles %}
+        <div id="login-div"></div>
+        <script type="text/jsx" src="{% static "react/ReactLogin.js" %}"></script>
+    {% endblock %}
