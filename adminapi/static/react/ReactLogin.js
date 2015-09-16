@@ -52,7 +52,7 @@ var LoginForm = React.createClass({displayName: 'LoginForm',
 });
 
 React.render(
-  React.createElement(LoginContainer,{url: '/login/'}),
+  React.createElement(LoginContainer,{url: '/login-auth/'}),
   document.getElementById('login-div')
 );
 
