@@ -6,28 +6,56 @@ var LoginContainer = React.createClass({displayName: 'ReactLogin',
             type: 'POST',
             beforeSend: function (xhr) {
                xhr.setRequestHeader('Authorization', 'Basic ' + btoa(data.username + ':' + data.password));
-               this.setState({errorMessage: ''});
+               this.setState({infoMessage: ''});
             }.bind(this),
             cache: false,
             success: function(data) {
-                this.setState({errorMessage: 'Success token: ' + data.token});
-                this.transitionTo('/test-view/');
+                console.log('Login success')
+                this.setState({infoMessage: 'Success token: ' + data.token});
+                console.log('state set');
+                Cookies.set('token', data, { expies: 1 }, { secure: true });
+                console.log('Cookie data set');
+
+                // Make a GET request to a view that requires auth token header
+                this.testAuthToken(data);
             }.bind(this),
             error: function(xhr, status, err) {
                 jsonError = JSON.parse(xhr.responseText);
                 console.error(this.props.url, status, err.toString(), ' Reason: ' + jsonError.detail);
-                this.setState({errorMessage: jsonError.detail});
+                this.setState({infoMessage: jsonError.detail});
+            }.bind(this)
+        });
+    },
+    // Test the recieved auth token
+    testAuthToken: function(data) {
+        $.ajax({
+            url: '/test-view/',
+            dataType: 'json',
+            type: 'GET',
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader('Authorization', 'Token ' + Cookies.getJSON('token').token);
+                this.setState({infoMessage: ''});
+                Cookies.remove('token');
+            }.bind(this),
+            cache: false,
+            success: function(data) {
+                this.setState({infoMessage: 'Success: ' + data.detail});
+            }.bind(this),
+            error: function(xhr, status, err) {
+                jsonError = JSON.parse(xhr.responseText);
+                console.error(this.props.url, status, err.toString(), ' Reason: ' + jsonError.detail);
+                this.setState({infoMessage: jsonError.detail});
             }.bind(this)
         });
     },
     getInitialState: function() {
-        return {errorMessage: ''};
+        return {infoMessage: ''};
     },
     render: function() {
         return (
             <div className="login-container" >
                 <LoginForm onLoginSubmit={ this.handleLoginSubmit } />
-                <p id="error-block">{ this.state.errorMessage }</p>
+                <p id="info-block">{ this.state.infoMessage }</p>
             </div>
         );
     }
