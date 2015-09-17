@@ -10,7 +10,6 @@ from rest_framework.response import Response
 from adminapi.serializers import UserSerializer
 
 
-# TODO Either remove or add permission
 class UserListView(generics.ListAPIView):
     permission_classes = (IsAdminUser,)
     queryset = User.objects.all()
@@ -23,11 +22,10 @@ class LoginView(APIView):
     def post(self, request, format=None):
         user = request.user
         token, created = Token.objects.get_or_create(user=user)
-        # TODO Remove username, for dev purposes only
         return Response({
-            'detail': 'Credentials Validated', 
-            'token': token.key,
-            'username': request.user.username
+            "detail": "Credentials Validated", 
+            "token": token.key,
+            "username": request.user.username
          })
 
 
@@ -36,4 +34,4 @@ class TestView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
-        return Response({'detail': 'Auth Token Valid'})
+        return Response({"detail": "Auth Token Valid"})
