@@ -6,7 +6,7 @@ var LoginContainer = React.createClass({displayName: 'ReactLogin',
             type: 'POST',
             data: '{username: ' + username +', password: ' + password +' }',
             beforeSend: function (xhr) {
-               xhr.setRequestHeader('Authorization',(username + ':' + password));
+               xhr.setRequestHeader('Authorization', (username + ':' + password));
             },
             cache: false,
             success: function(data) {
@@ -52,7 +52,7 @@ var LoginForm = React.createClass({displayName: 'LoginForm',
 });
 
 React.render(
-  React.createElement(LoginContainer,{url: '/login-auth/'}),
-  document.getElementById('login-div')
+    React.createElement(LoginContainer,{url: '/login-auth/'}),
+    document.getElementById('login-div')
 );
 
