@@ -9,9 +9,16 @@ Expose Django's admin as a RESTful service
         ...
         'adminapi',
     )
+2. Ensure project has DjangoRESTFramework installed and ensure the REST auth token is also included in settings::
 
-2. Include the adminapi URLconf in your project urls.py like this::
+    INSTALLED_APPS = (
+        ...
+        'rest_framework',
+        'rest_framework.authtoken',
+    )
+
+3. Include the adminapi URLconf in your project urls.py like this::
 
     url(r'^adminapi/', include('adminapi.urls')),
 
-3. Run `python manage.py migrate` to create the adminapi models.
+4. Run `python manage.py migrate` to create the adminapi models.
