@@ -12,7 +12,7 @@ setup(
     packages=find_packages(),
     install_requires=[
         "Django<1.7",
-        "djangorestframework<3.2.3",
+        "djangorestframework",
     ],
     include_package_data=True,
     tests_require=[
