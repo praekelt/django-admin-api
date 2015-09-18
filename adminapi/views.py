@@ -4,7 +4,7 @@ from rest_framework import viewsets, generics
 from rest_framework.views import APIView
 from rest_framework.authtoken.models import Token
 from rest_framework.authentication import TokenAuthentication
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 
 from adminapi.serializers import UserSerializer
@@ -23,7 +23,7 @@ class LoginView(APIView):
         user = request.user
         token, created = Token.objects.get_or_create(user=user)
         return Response({
-            "detail": "Credentials Validated", 
+            "detail": "Credentials Validated",
             "token": token.key,
             "username": request.user.username
          })

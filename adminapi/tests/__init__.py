@@ -1,42 +1,130 @@
+import base64
+
 from django.test import TestCase
 from django.contrib.auth.models import User
 from django.test import RequestFactory
+from django.db import models
+
+from rest_framework.test import APIRequestFactory, APIClient
+from rest_framework.authtoken.models import Token
+
+from adminapi.views import LoginView, TestView
+
+# from .test_models import TestModel
+
+
+class TestModel(models.Model):
+    test_editable_field = models.CharField(max_length=32)
+    test_non_ediable_field = models.CharField(max_length=32, editable=False)
+models.register_models('adminapi', TestModel)
 
 
 class TrivialTest(TestCase):
 
-    def trivial_true_test(self):
-            test_var = True
-            self.assertEqual(test_var, True)
+    @classmethod
+    def setUpClass(cls):
+        cls.obj = TestModel()
+        cls.obj.save()
+
+    @classmethod
+    def tearDownClass(cls):
+        super(TrivialTest, cls).tearDownClass()
+
+    def test_model_instantiation(self):
+        self.assertIsNotNone(self.obj)
+
+    def test_model_fields_success(self):
+        self.obj.test_editable_field = 'Test chars'
+        self.obj.save()
+        self.assertEqual(self.obj.test_editable_field, 'Test chars')
+
+    def test_model_fields_fail(self):
+        self.obj.test_editable_field = 'Test chars'
+        self.obj.save()
+        self.assertNotEqual(self.obj.test_editable_field, 'Not correct')
+
+    def test_trivial_true(self):
+        test_var = True
+        self.assertEqual(test_var, True)
 
 
 class LoginTest(TestCase):
 
-    def setup(self):
-        self.factory = RequestFactory()
-        self.user = User.objects.create_user(
-            username='tester',
-            email='tester@foo.com', password='test1pass'
-        )
+    def setUp(self):
+          self.client = APIClient()
 
-    def login_success(self):
-        request = self.factory.post(
-            '/login-auth/',
-            {'Authorization': 'tester:test1pss'}
+    @classmethod
+    def setUpClass(cls):
+        cls.user = User.objects.create_user(
+            username='tester',
+            email='tester@foo.com',
+            password='test1pass',
+        )
+        cls.user.is_active = True
+        cls.user.is_superuser = True
+        cls.user.save()
+        cls.token = Token.objects.create(user=cls.user)
+        cls.token.save()
+        super(LoginTest, cls).setUpClass()
+
+    @classmethod
+    def tearDownClass(cls):
+        super(LoginTest, cls).tearDownClass()
+
+    def test_login_success(self):
+        self.client.credentials(
+            HTTP_AUTHORIZATION='Basic ' + base64.b64encode('tester:test1pass')
+        )
+        response = self.client.post(
+            '/login-auth/'
         )
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(
-            response_content,
-            {'detail': 'Credentials Validated'}
+            response.content,
+            {
+                'detail': 'Credentials Validated',
+                'token': self.token.key,
+                'username': self.user.username
+            }
         )
 
-    def login_fail(self):
-        request = self.factory.post(
-            '/login-auth/',
-            {'Authorization': 'null:empty'}
+    def test_login_fail(self):
+        self.client.credentials(
+            HTTP_AUTHORIZATION='Basic ' + base64.b64encode('wrong:creds')
+        )
+        response = self.client.post(
+            '/login-auth/'
         )
         self.assertEqual(response.status_code, 403)
         self.assertJSONEqual(
-            response_content,
-            {'detail': 'Invalid username/password.'}
+            response.content,
+            {
+                'detail': "Invalid username/password.",
+            }
+        )
+
+    def test_token_auth_success(self):
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+        response = self.client.get(
+            '/test-view/'
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(
+            response.content,
+            {
+                'detail': 'Auth Token Valid',
+            }
+        )
+
+    def test_token_auth_fail(self):
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + 'Cr4ppyT0k3n')
+        response = self.client.get(
+            '/test-view/'
+        )
+        self.assertEqual(response.status_code, 401)
+        self.assertJSONEqual(
+            response.content,
+            {
+                'detail': 'Invalid token.',
+            }
         )
