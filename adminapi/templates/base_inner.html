@@ -1,15 +1,20 @@
 <html>
     <head>
-        <title>Login</title>
+        <title>
+            {% block title %}
+            {% endblock %}
+        </title>
         {% load static from staticfiles %}
         <meta charset="UTF-8" />
-        <script src="{% static "build/react.js" %}"></script>
-        <script src="{% static "build/JSXTransformer.js" %}"></script>
-        <script src="{% static "build/js.cookie.js" %}"></script>
-
-        <!-- For production have all scripts hosted by server -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/0.3.2/marked.min.js"></script>
+        <script src="{% static "libs/react-0.13.3.min.js" %}"></script>
+        <!--
+            JSXTransformer should not be used in production,
+            React scripts should all be build out to plain js
+        -->
+        <script src="{% static "libs/JSXTransformer-0.13.3.js" %}"></script>
+        <script src="{% static "libs/js.cookie.js" %}"></script>
+        <script src="{% static "libs/jquery-2.1.4.min.js" %}"></script>
+        <script src="{% static "libs/marked-0.3.5.min.js" %}"></script>
     </head>
     <body>
         <div id="content">

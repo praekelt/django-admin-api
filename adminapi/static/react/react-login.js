@@ -1,5 +1,6 @@
 var LoginContainer = React.createClass({displayName: 'ReactLogin',
     handleLoginSubmit: function(data) {
+        console.log(csrftoken);
         $.ajax({
             url: this.props.url,
             dataType: 'json',
@@ -13,7 +14,7 @@ var LoginContainer = React.createClass({displayName: 'ReactLogin',
                 console.log('Login success')
                 this.setState({infoMessage: 'Success token: ' + data.token});
                 console.log('state set');
-                Cookies.set('token', data, { expies: 1 }, { secure: true });
+                Cookies.set('token', data, {expires: 1}, {secure: true});
                 console.log('Cookie data set');
 
                 // Make a GET request to a view that requires auth token header
@@ -27,9 +28,10 @@ var LoginContainer = React.createClass({displayName: 'ReactLogin',
         });
     },
     // Test the recieved auth token
+    // Makes a GET call to djangoREST api view, that requires jsw token validation
     testAuthToken: function(data) {
         $.ajax({
-            url: '/test-view/',
+            url: '/test/',
             dataType: 'json',
             type: 'GET',
             beforeSend: function (xhr) {
@@ -66,8 +68,9 @@ var LoginForm = React.createClass({displayName: 'LoginForm',
         e.preventDefault();
         var username = React.findDOMNode(this.refs.username).value.trim();
         var password = React.findDOMNode(this.refs.password).value.trim();
-        // TODO form validation
+        // Final catch if HTML5 validation fails
         if (!password || !username) {
+            alert('Please fill in both username and password fields');
             return;
         }
         this.props.onLoginSubmit({username: username, password: password});
@@ -86,7 +89,7 @@ var LoginForm = React.createClass({displayName: 'LoginForm',
 });
 
 React.render(
-    React.createElement(LoginContainer,{url: '/login-auth/'}),
+    React.createElement(LoginContainer,{url: '/login-api/'}),
     document.getElementById('login-div')
 );
 
