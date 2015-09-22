@@ -6,6 +6,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
+from rest_framework import serializers
 
 from adminapi.serializers import UserSerializer
 
@@ -35,3 +36,10 @@ class TestView(APIView):
 
     def get(self, request, format=None):
         return Response({"detail": "Auth Token Valid"})
+
+
+class GenericView(generics.ListAPIView):
+    authentication_classes = (TokenAuthentication,)
+    # TODO Pass model via POST body
+    queryset = .objects.all()
+    serializer_class = serializers.ModelSerializer

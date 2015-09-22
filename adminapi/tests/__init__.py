@@ -10,8 +10,6 @@ from rest_framework.authtoken.models import Token
 
 from adminapi.views import LoginView, TestView
 
-# from .test_models import TestModel
-
 
 class TestModel(models.Model):
     test_editable_field = models.CharField(max_length=32)
@@ -76,7 +74,7 @@ class LoginTest(TestCase):
             HTTP_AUTHORIZATION='Basic ' + base64.b64encode('tester:test1pass')
         )
         response = self.client.post(
-            '/login-auth/'
+            '/login/'
         )
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(
@@ -93,7 +91,7 @@ class LoginTest(TestCase):
             HTTP_AUTHORIZATION='Basic ' + base64.b64encode('wrong:creds')
         )
         response = self.client.post(
-            '/login-auth/'
+            '/login/'
         )
         self.assertEqual(response.status_code, 403)
         self.assertJSONEqual(
@@ -106,7 +104,7 @@ class LoginTest(TestCase):
     def test_token_auth_success(self):
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
         response = self.client.get(
-            '/test-view/'
+            '/test/'
         )
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(
@@ -117,9 +115,9 @@ class LoginTest(TestCase):
         )
 
     def test_token_auth_fail(self):
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + 'Cr4ppyT0k3n')
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + 'Wr0ngT0k3n')
         response = self.client.get(
-            '/test-view/'
+            '/test/'
         )
         self.assertEqual(response.status_code, 401)
         self.assertJSONEqual(
