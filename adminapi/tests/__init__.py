@@ -142,15 +142,17 @@ class LoginTest(TestCase):
             }
         )
 
-    def test_model_data_retrieve_success(self):
+    def test_model_data_retrieve_list_success(self):
         self.test_model.test_editable_field = 'Retrieve Test'
         self.test_model.save()
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
         response = self.client.get(
-            '/generic/',
-            {
+            '/generic/1/',
+             {
                 'id': 1,
-            }
+                'test_editable_field': 'Retrieve Test'
+
+             }
         )
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(
@@ -161,3 +163,33 @@ class LoginTest(TestCase):
                 'test_non_editable_field': '',
             }
         )
+
+    def test_model_data_update_success(self):
+        self.test_model.test_editable_field = 'Update Test'
+        self.test_model.save()
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+        response = self.client.put(
+            '/generic/1/',
+            {
+                'id': 1,
+                'test_editable_field': 'Changed data',
+            }
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(
+            response.content,
+            {
+                'id': 1,
+                'test_editable_field': 'Changed data',
+                'test_non_editable_field': '',
+            }
+        )
+
+    def test_model_data_delete_success(self):
+        self.test_model.test_editable_field = 'Delete Test'
+        self.test_model.save()
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+        response = self.client.delete(
+            '/generic/1/',
+        )
+        self.assertEqual(response.status_code, 204)

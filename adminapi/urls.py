@@ -1,7 +1,12 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import patterns, url, include
+
+from rest_framework.routers import DefaultRouter
 
 from adminapi import views
 
+
+router = DefaultRouter()
+router.register(r'generic', views.GenericViewSet)
 
 urlpatterns = patterns(
 
@@ -10,6 +15,5 @@ urlpatterns = patterns(
     url(r"^login/$", views.LoginView.as_view(), name="login"),
     url(r"^test/$", views.TestView.as_view(), name="test"),
 
-    url(r'^generic/$', views.GenericList.as_view(), name='generic-list'),
-    url(r'^generic/(?P<pk>[0-9]+)$', views.GenericView.as_view(), name='generic'),
+    url(r'^', include(router.urls)),
 )

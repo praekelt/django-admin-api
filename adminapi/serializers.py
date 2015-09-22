@@ -1,5 +1,8 @@
+import types
+
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
+from django.db import models
 
 from rest_framework import serializers, exceptions
 
@@ -25,6 +28,6 @@ class UserSerializer(serializers.ModelSerializer):
             )
 
 
-class GenericSerializer(serializers.ModelSerializer):
+class GenericSerializer(serializers.Serializer):
     class Meta:
         model = TestModel

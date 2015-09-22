@@ -7,9 +7,9 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework import serializers
-from rest_framework import mixins
+from rest_framework import viewsets
 
-from adminapi.serializers import UserSerializer, GenericSerializer
+from adminapi.serializers import UserSerializer, GenericSerializer, GenericMeta
 
 from adminapi.tests.models import TestModel
 class UserListView(generics.ListAPIView):
@@ -38,12 +38,7 @@ class TestView(APIView):
     def get(self, request, format=None):
         return Response({"detail": "Auth Token Valid"})
 
-class GenericList(generics.ListCreateAPIView):
-    queryset = TestModel.objects.all()
-    serializer_class = GenericSerializer 
 
-class GenericView(generics.RetrieveUpdateDestroyAPIView):
-    authentication_classes = (TokenAuthentication,)
-   # TODO Pass model via POST body
+class GenericViewSet(viewsets.ModelViewSet):
     queryset = TestModel.objects.all()
-    serializer_class = serializers.ModelSerializer
+    serializer_class = GenericSerializer
