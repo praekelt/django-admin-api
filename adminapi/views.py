@@ -9,9 +9,11 @@ from rest_framework.response import Response
 from rest_framework import serializers
 from rest_framework import viewsets
 
-from adminapi.serializers import UserSerializer, GenericSerializer, GenericMeta
-
+from adminapi.serializers import UserSerializer, GenericSerializer
 from adminapi.tests.models import TestModel
+from adminapi import registry
+
+
 class UserListView(generics.ListAPIView):
     permission_classes = (IsAdminUser,)
     queryset = User.objects.all()
@@ -40,5 +42,8 @@ class TestView(APIView):
 
 
 class GenericViewSet(viewsets.ModelViewSet):
-    queryset = TestModel.objects.all()
-    serializer_class = GenericSerializer
+    model = registry.model_registry['TestModel']
+    queryset = model.objects.all()
+    serializer = GenericSerializer
+    serializer.Meta.model = model
+    serializer_class = serializer

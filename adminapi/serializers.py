@@ -28,6 +28,6 @@ class UserSerializer(serializers.ModelSerializer):
             )
 
 
-class GenericSerializer(serializers.Serializer):
+class GenericSerializer(serializers.ModelSerializer):
     class Meta:
-        model = TestModel
+        model = None
