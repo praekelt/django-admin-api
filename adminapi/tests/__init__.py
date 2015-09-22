@@ -9,12 +9,8 @@ from rest_framework.test import APIRequestFactory, APIClient
 from rest_framework.authtoken.models import Token
 
 from adminapi.views import LoginView, TestView
+from adminapi.tests.models import TestModel
 
-
-class TestModel(models.Model):
-    test_editable_field = models.CharField(max_length=32)
-    test_non_ediable_field = models.CharField(max_length=32, editable=False)
-models.register_models('adminapi', TestModel)
 
 
 class TrivialTest(TestCase):
@@ -28,6 +24,10 @@ class TrivialTest(TestCase):
     def tearDownClass(cls):
         super(TrivialTest, cls).tearDownClass()
 
+    def test_trivial_true(self):
+        test_var = True
+        self.assertEqual(test_var, True)
+
     def test_model_instantiation(self):
         self.assertIsNotNone(self.obj)
 
@@ -40,10 +40,6 @@ class TrivialTest(TestCase):
         self.obj.test_editable_field = 'Test chars'
         self.obj.save()
         self.assertNotEqual(self.obj.test_editable_field, 'Not correct')
-
-    def test_trivial_true(self):
-        test_var = True
-        self.assertEqual(test_var, True)
 
 
 class LoginTest(TestCase):
@@ -63,6 +59,7 @@ class LoginTest(TestCase):
         cls.user.save()
         cls.token = Token.objects.create(user=cls.user)
         cls.token.save()
+        cls.test_model = TestModel()
         super(LoginTest, cls).setUpClass()
 
     @classmethod
@@ -124,5 +121,43 @@ class LoginTest(TestCase):
             response.content,
             {
                 'detail': 'Invalid token.',
+            }
+        )
+
+    def test_model_data_creation_success(self):
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+        response = self.client.post(
+            '/generic/',
+            {
+                'test_editable_field': 'Test Chars',
+            }
+        )
+        self.assertEqual(response.status_code, 201)
+        self.assertJSONEqual(
+            response.content,
+            {
+                'id': 1,
+                'test_editable_field': 'Test Chars',
+                'test_non_editable_field': '',
+            }
+        )
+
+    def test_model_data_retrieve_success(self):
+        self.test_model.test_editable_field = 'Retrieve Test'
+        self.test_model.save()
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+        response = self.client.get(
+            '/generic/',
+            {
+                'id': 1,
+            }
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(
+            response.content,
+            {
+                'id': 1,
+                'test_editable_field': 'Retrieve Test',
+                'test_non_editable_field': '',
             }
         )
