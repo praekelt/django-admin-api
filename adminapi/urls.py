@@ -16,4 +16,6 @@ urlpatterns = patterns(
     url(r"^test/$", views.TestView.as_view(), name="test"),
 
     url(r'^', include(router.urls)),
+
+    url("^edit/$", TemplateView.as_view(template_name="react/react_edit.html"), name="app-edit"),
 )

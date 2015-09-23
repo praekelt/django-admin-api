@@ -42,7 +42,8 @@ class TestView(APIView):
 
 
 class GenericViewSet(viewsets.ModelViewSet):
-    model = registry.model_registry['TestModel']
+    authentication_classes = (TokenAuthentication,)
+    model = registry.model_registry[request.META.get('HTTP_CLASS')]
     queryset = model.objects.all()
     serializer = GenericSerializer
     serializer.Meta.model = model
