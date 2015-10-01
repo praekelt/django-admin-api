@@ -15,6 +15,7 @@ INSTALLED_APPS = (
     'rest_framework',
     'rest_framework.authtoken',
     'adminapi',
+    'adminapi.tests',
 )
 
 ROOT_URLCONF = 'adminapi.urls'

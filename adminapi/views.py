@@ -6,8 +6,12 @@ from rest_framework.authtoken.models import Token
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
+from rest_framework import serializers
+from rest_framework import viewsets
 
-from adminapi.serializers import UserSerializer
+from adminapi.serializers import UserSerializer, GenericSerializer
+from adminapi.tests.models import TestModel
+from adminapi import registry
 
 
 class UserListView(generics.ListAPIView):
@@ -35,3 +39,11 @@ class TestView(APIView):
 
     def get(self, request, format=None):
         return Response({"detail": "Auth Token Valid"})
+
+
+class GenericViewSet(viewsets.ModelViewSet):
+    model = registry.model_registry['TestModel']
+    queryset = model.objects.all()
+    serializer = GenericSerializer
+    serializer.Meta.model = model
+    serializer_class = serializer

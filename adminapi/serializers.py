@@ -1,7 +1,12 @@
+import types
+
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
+from django.db import models
 
 from rest_framework import serializers, exceptions
+
+from adminapi.tests.models import TestModel
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -22,3 +27,8 @@ class UserSerializer(serializers.ModelSerializer):
             "is_active",
             "date_joined",
             )
+
+
+class GenericSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = None
