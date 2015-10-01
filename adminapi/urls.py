@@ -15,10 +15,10 @@ urlpatterns = patterns(
     url("^login/app/$", TemplateView.as_view(template_name="react/login.html"), name="app-login"),
 
     # RestFramework views
-    url(r"^users/$", UserListView.as_view(), name="users"),
-    url(r"^login/$", LoginView.as_view(), name="login"),
+    url(r"^users/$", views.UserListView.as_view(), name="users"),
+    url(r"^login/$", views.LoginView.as_view(), name="login"),
     # Used to test React login token auth
-    url(r"^test/$", TestView.as_view(), name="test"),
+    url(r"^test/$", views. TestView.as_view(), name="test"),
 
     url(r'^', include(router.urls)),
 )
