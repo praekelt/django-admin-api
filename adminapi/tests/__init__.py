@@ -4,6 +4,7 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from django.test import RequestFactory
 from django.db import models
+from django.core.urlresolvers import reverse
 
 from rest_framework.test import APIRequestFactory, APIClient
 from rest_framework.authtoken.models import Token
@@ -127,7 +128,7 @@ class LoginTest(TestCase):
     def test_model_data_creation_success(self):
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
         response = self.client.post(
-            '/generic/',
+            reverse('generic-list'),
             {
                 'test_editable_field': 'Test Chars',
             }
@@ -147,7 +148,7 @@ class LoginTest(TestCase):
         self.test_model.save()
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
         response = self.client.get(
-            '/generic/',
+           reverse('generic-list'),
         )
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(
@@ -166,7 +167,7 @@ class LoginTest(TestCase):
         self.test_model.save()
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
         response = self.client.put(
-            '/generic/1/',
+            reverse('generic-detail', args=[1]),
             {
                 'id': 1,
                 'test_editable_field': 'Changed data',
@@ -187,6 +188,6 @@ class LoginTest(TestCase):
         self.test_model.save()
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
         response = self.client.delete(
-            '/generic/1/',
+            reverse('generic-detail', args=[1]),
         )
         self.assertEqual(response.status_code, 204)
