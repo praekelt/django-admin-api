@@ -27,7 +27,7 @@ var LoginContainer = React.createClass({displayName: 'ReactLogin',
             }.bind(this)
         });
     },
-    // Test the recieved auth token
+    // Test the received auth token
     // Makes a GET call to djangoREST api view, that requires jsw token validation
     testAuthToken: function(data) {
         $.ajax({
@@ -90,6 +90,6 @@ var LoginForm = React.createClass({displayName: 'LoginForm',
 
 React.render(
     React.createElement(LoginContainer,{url: '/login-api/'}),
-    document.getElementById('login-div')
+    document.getElementById('login')
 );
 

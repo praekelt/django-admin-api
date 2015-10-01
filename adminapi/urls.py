@@ -6,8 +6,8 @@ from adminapi.views import LoginView, UserListView, TestView
 
 urlpatterns = patterns(
     "",
-    # SPA template views
-    url("^login/app/$", TemplateView.as_view(template_name="react/react_login.html"), name="app-login"),
+    # Single Page App template views(Currently using React)
+    url("^login/app/$", TemplateView.as_view(template_name="react/login.html"), name="app-login"),
 
     # RestFramework views
     url(r"^users/$", UserListView.as_view(), name="users"),
