@@ -1,7 +1,8 @@
+{% load i18n %}
 {% extends "base_inner.html" %}
 {% block title %}{% trans "Login" %}{% endblock %}
-    {% block content %}
-        {% load static from staticfiles %}
-        <div id="login"></div>
-        <script type="text/jsx" src="{% static "react/react-login.js" %}"></script>
-    {% endblock %}
+{% block content %}
+    {% load static from staticfiles %}
+    <div id="login"></div>
+    <script type="text/jsx" src="{% static "react/react.js" %}"></script>
+{% endblock %}
