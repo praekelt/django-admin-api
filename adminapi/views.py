@@ -23,7 +23,7 @@ class LoginView(APIView):
         user = request.user
         token, created = Token.objects.get_or_create(user=user)
         return Response({
-            "detail": "Credentials Validated", 
+            "detail": "Credentials Validated",
             "token": token.key,
             "username": request.user.username
          })
