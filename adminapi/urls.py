@@ -12,7 +12,11 @@ router.register(r'generic', views.GenericViewSet, base_name='generic')
 urlpatterns = patterns(
     "",
     # Single Page App template views(Currently using React)
-    url("^login/app/$", TemplateView.as_view(template_name="react/login.html"), name="app-login"),
+    url(
+        "^login/app/$",
+        TemplateView.as_view(template_name="react/login.html"),
+        name="app-login"
+       ),
 
     # RestFramework views
     url(r"^users/$", views.UserListView.as_view(), name="users"),

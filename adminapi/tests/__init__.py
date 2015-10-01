@@ -13,7 +13,6 @@ from adminapi.views import LoginView, TestView
 from adminapi.tests.models import TestModel
 
 
-
 class TrivialTest(TestCase):
 
     @classmethod
@@ -46,7 +45,7 @@ class TrivialTest(TestCase):
 class LoginTest(TestCase):
 
     def setUp(self):
-          self.client = APIClient()
+        self.client = APIClient()
 
     @classmethod
     def setUpClass(cls):

@@ -8,6 +8,7 @@ from rest_framework import serializers, exceptions
 
 from adminapi.tests.models import TestModel
 
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
