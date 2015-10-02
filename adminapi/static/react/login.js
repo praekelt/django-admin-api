@@ -1,6 +1,21 @@
+// Acquire csrf token and set token header for all subsequent ajax calls
+var csrftoken = Cookies.get('csrftoken');
+$(function () {
+    function csrfSafeMethod(method) {
+        // these HTTP methods do not require CSRF protection
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            }
+        }
+    });
+});
+console.log(csrftoken);
 var LoginContainer = React.createClass({displayName: 'ReactLogin',
     handleLoginSubmit: function(data) {
-        console.log(csrftoken);
         $.ajax({
             url: this.props.url,
             dataType: 'json',
@@ -37,11 +52,11 @@ var LoginContainer = React.createClass({displayName: 'ReactLogin',
             beforeSend: function (xhr) {
                 xhr.setRequestHeader('Authorization', 'Token ' + Cookies.getJSON('token').token);
                 this.setState({infoMessage: ''});
-                Cookies.remove('token');
             }.bind(this),
             cache: false,
             success: function(data) {
                 this.setState({infoMessage: 'Success: ' + data.detail});
+                window.location = '/app/form/';
             }.bind(this),
             error: function(xhr, status, err) {
                 jsonError = JSON.parse(xhr.responseText);
@@ -89,7 +104,7 @@ var LoginForm = React.createClass({displayName: 'LoginForm',
 });
 
 React.render(
-    React.createElement(LoginContainer,{url: '/login-api/'}),
+    React.createElement(LoginContainer,{url: '/login/'}),
     document.getElementById('login')
 );
 
