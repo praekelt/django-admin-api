@@ -1,3 +1,20 @@
+// Acquire csrf token and set token header for all subsequent ajax calls
+var csrftoken = Cookies.get('csrftoken');
+$(function () {
+    function csrfSafeMethod(method) {
+        // these HTTP methods do not require CSRF protection
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            }
+        }
+    });
+});
+console.log(csrftoken);
+
 var LoginContainer = React.createClass({displayName: 'ReactLogin',
     handleLoginSubmit: function(data) {
         console.log(csrftoken);
@@ -16,32 +33,7 @@ var LoginContainer = React.createClass({displayName: 'ReactLogin',
                 console.log('state set');
                 Cookies.set('token', data, {expires: 1}, {secure: true});
                 console.log('Cookie data set');
-
-                // Make a GET request to a view that requires auth token header
-                this.testAuthToken(data);
-            }.bind(this),
-            error: function(xhr, status, err) {
-                jsonError = JSON.parse(xhr.responseText);
-                console.error(this.props.url, status, err.toString(), ' Reason: ' + jsonError.detail);
-                this.setState({infoMessage: jsonError.detail});
-            }.bind(this)
-        });
-    },
-    // Test the received auth token
-    // Makes a GET call to djangoREST api view, that requires jsw token validation
-    testAuthToken: function(data) {
-        $.ajax({
-            url: '/test/',
-            dataType: 'json',
-            type: 'GET',
-            beforeSend: function (xhr) {
-                xhr.setRequestHeader('Authorization', 'Token ' + Cookies.getJSON('token').token);
-                this.setState({infoMessage: ''});
-                Cookies.remove('token');
-            }.bind(this),
-            cache: false,
-            success: function(data) {
-                this.setState({infoMessage: 'Success: ' + data.detail});
+                window.location = '/users/';
             }.bind(this),
             error: function(xhr, status, err) {
                 jsonError = JSON.parse(xhr.responseText);
@@ -62,7 +54,6 @@ var LoginContainer = React.createClass({displayName: 'ReactLogin',
         );
     }
 });
-
 var LoginForm = React.createClass({displayName: 'LoginForm',
     handleSubmit: function(e) {
         e.preventDefault();
@@ -89,7 +80,7 @@ var LoginForm = React.createClass({displayName: 'LoginForm',
 });
 
 React.render(
-    React.createElement(LoginContainer,{url: '/login-api/'}),
+    React.createElement(LoginContainer,{url: '/login/'}),
     document.getElementById('login')
 );
 

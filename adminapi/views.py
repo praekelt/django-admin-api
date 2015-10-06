@@ -14,7 +14,7 @@ from adminapi.tests.models import TestModel
 from adminapi import registry
 
 
-class UserListView(generics.ListAPIView):
+class UserViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdminUser,)
     queryset = User.objects.all()
     serializer_class = UserSerializer

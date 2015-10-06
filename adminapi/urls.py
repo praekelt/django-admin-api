@@ -8,6 +8,7 @@ from adminapi import views
 
 router = DefaultRouter()
 router.register(r'generic', views.GenericViewSet, base_name='generic')
+router.register(r'users', views.UserViewSet, base_name='users')
 
 urlpatterns = patterns(
     "",
@@ -17,9 +18,13 @@ urlpatterns = patterns(
         TemplateView.as_view(template_name="react/login.html"),
         name="app-login"
        ),
+    url(
+        "^users/app/$",
+        TemplateView.as_view(template_name="react/user-admin.html"),
+        name="app-users"
+       ),
 
     # RestFramework views
-    url(r"^users/$", views.UserListView.as_view(), name="users"),
     url(r"^login/$", views.LoginView.as_view(), name="login"),
     # Used to test React login token auth
     url(r"^test/$", views. TestView.as_view(), name="test"),
