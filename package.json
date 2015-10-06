@@ -1,0 +1,17 @@
+{
+    "name": "django-adminapi",
+    "devDependencies": {
+        "react": "*",
+        "babel-jest": "*",
+        "jest-cli": "*",
+        "jquery": "*",
+        "js-cookie": "*"
+    },
+    "scripts": {
+        "test": "jest --verbose"
+    },
+    "jest": {
+        "scriptPreprocessor": "<rootDir>/node_modules/babel-jest",
+        "unmockedModulePathPatterns": ["<rootDir>/node_modules/react"]
+    }
+}
