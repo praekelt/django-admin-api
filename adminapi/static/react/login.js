@@ -33,7 +33,7 @@ var LoginContainer = React.createClass({displayName: 'ReactLogin',
                 console.log('state set');
                 Cookies.set('token', data, {expires: 1}, {secure: true});
                 console.log('Cookie data set');
-                window.location = '/users/';
+                window.location = '/users/app/';
             }.bind(this),
             error: function(xhr, status, err) {
                 jsonError = JSON.parse(xhr.responseText);

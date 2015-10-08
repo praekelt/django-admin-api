@@ -90,7 +90,7 @@ class LoginTest(TestCase):
         response = self.client.post(
             '/login/'
         )
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 401)
         self.assertJSONEqual(
             response.content,
             {
@@ -190,3 +190,74 @@ class LoginTest(TestCase):
             reverse('generic-detail', args=[1]),
         )
         self.assertEqual(response.status_code, 204)
+
+
+class CRUDUsersTest(TestCase):
+
+    def setUp(self):
+        self.client = APIClient()
+
+    @classmethod
+    def setUpClass(cls):
+        cls.user = User.objects.create_user(
+            username='Super',
+            email='tester@foo.com',
+            password='test1pass',
+        )
+        cls.user.is_active = True
+        cls.user.is_superuser = True
+        cls.user.is_staff = True
+        cls.user.save()
+        cls.token = Token.objects.create(user=cls.user)
+        cls.token.save()
+        super(CRUDUsersTest, cls).setUpClass()
+
+    @classmethod
+    def tearDownClass(cls):
+        super(CRUDUsersTest, cls).tearDownClass()
+
+    def test_permission_success(self):
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+        response = self.client.get(
+            '/users/'
+        )
+        self.assertEqual(response.status_code, 200)
+
+    def test_access_denied(self):
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + 'Wr0ngT0k3n')
+        response = self.client.get(
+            '/users/'
+        )
+        self.assertEqual(response.status_code, 401)
+
+    def test_model_data_retrieve_list_success(self):
+        '''
+        self.user = User.objects.create_user(
+            username='returnTestUser',
+            first_name='first',
+            last_name='last',
+            email='tester@foo.com',
+            password='password',
+        )
+        self.user.is_active = True
+        self.user.is_superuser = True
+        self.user.is_staff = True
+        self.user.save()
+        '''
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+        response = self.client.get(
+           reverse('users-list'),
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(
+            response.content,
+            [
+                {
+                    'email': 'tester@foo.com',
+                    'first_name': '',
+                    'id': 1,
+                    'password': 'bkdf2_sha256$12000$UGEPg7YTW8V2$Mp9iDZKrfhFXRnxGZumFUgxG1qj8H9r88q0F5FsOX/c=',
+                    'username': 'Super'
+                }
+            ]
+        )

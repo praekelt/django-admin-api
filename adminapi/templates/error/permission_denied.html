@@ -1,0 +1,15 @@
+{% extends "base_inner.html" %}
+{% load i18n %}
+{% block title %}{% trans "Permission Denied" %}{% endblock %}
+{% block content %}
+    <div id="message">
+        <p>You do not have permission to access this data</p>
+    </div>
+    <script type="text/javascript">
+        jQuery(document).ready(function() {
+            setTimeout(function() {
+                window.location.replace("/login/app/");
+            }, 2500);
+        });
+    </script>
+{% endblock %}

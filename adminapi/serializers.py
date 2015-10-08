@@ -10,22 +10,50 @@ from adminapi.tests.models import TestModel
 
 
 class UserSerializer(serializers.ModelSerializer):
+    # Allows the password field to be empty
+    # password = serializers.CharField(allow_null=True)
+
+    def create(self, validated_data):
+        user = User.objects.create(
+            username = validated_data['username'],
+            first_name = validated_data['first_name'],
+            last_name = validated_data['last_name'],
+            email = validated_data['email'],
+        )
+        user.set_password(validated_data['password'])
+        user.save()
+
+        return user
+
+    def update(self, instance, validated_data):
+        instance.username = validated_data['username']
+        instance.first_name = validated_data['first_name']
+        instance.last_name = validated_data['last_name']
+        instance.email = validated_data['email']
+
+        if validated_data.get('password', None) is not None:
+            instance.set_password(validated_data['password'])
+
+        instance.save()
+
+        return instance
+
     class Meta:
         model = User
         fields = (
-            "id",
-            "username",
-            "password",
-            "first_name",
-            "last_name",
-            "email",
+            'id',
+            'username',
+            'password',
+            'first_name',
+            'last_name',
+            'email',
             )
-        write_only_fields = ("password",)
+        write_only_fields = ('password',)
         read_only_fields = (
-            "is_staff",
-            "is_superuser",
-            "is_active",
-            "date_joined",
+            'is_staff',
+            'is_superuser',
+            'is_active',
+            'date_joined',
             )
 
 

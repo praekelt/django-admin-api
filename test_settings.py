@@ -18,6 +18,10 @@ INSTALLED_APPS = (
     'adminapi.tests',
 )
 
+TEMPLATE_CONTEXT_PROCESSORS = (
+    'django.core.context_processors.request',
+)
+
 ROOT_URLCONF = 'adminapi.urls'
 
 # xxx: get tests to pass with migrations
