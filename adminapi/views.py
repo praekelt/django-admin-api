@@ -13,17 +13,40 @@ from adminapi.serializers import UserSerializer, GenericSerializer
 from adminapi.tests.models import TestModel
 from adminapi import registry
 
+import pdb
 class UserViewSet(viewsets.ModelViewSet):
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAdminUser,)
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
+    def create(self, request):
+        serializer = UserSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        user = serializer.data
+        del user['password']
+        return Response(user)
+
+    def list(self, request):
+        serializer = UserSerializer(User.objects.all(), many=True)
+        for user in serializer.data:
+            del user['password']
+        return Response(serializer.data)
+
+    def retrieve(self, request, pk=None):
+        serializer = UserSerializer(self.get_object())
+        user = serializer.data
+        del user['password']
+        return Response(user)
+
     def update(self, request, pk=None):
         serializer = UserSerializer(self.get_object(), data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response(serializer.data)
+        user = serializer.data
+        del user['password']
+        return Response(user)
 
 class LoginView(APIView):
     authentication_classes = (BasicAuthentication, )

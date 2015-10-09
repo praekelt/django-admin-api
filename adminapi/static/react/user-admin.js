@@ -82,7 +82,6 @@ var FormContainer = React.createClass({displayName: 'ReactForm',
         });
     },
     handleDelete: function(data) {
-        console.log(Cookies.getJSON('token').token);
         $.ajax({
             url: this.props.url + data.id + '/',
             datatype: 'json',
@@ -148,9 +147,16 @@ var ModelList = React.createClass({displayName: 'ModelList',
             );
         }.bind(this));
         return(
-            <ul id="list">
-                {listItems}
-            </ul>
+            <table className="userTable">
+                <tbody>
+                    <tr>
+                        <th C>Username</th>
+                        <th>First name</th>
+                        <th>Email address</th>
+                    </tr>
+                    {listItems}
+                </tbody>
+            </table>
         );
     }
 });
@@ -164,11 +170,11 @@ var Model = React.createClass({displayName: 'Model',
 
     render: function() {
         return (
-            <li id={"item-"+this.props.data.id}>
-                <a onClick={this.handleClick} >
-                    {this.props.data.username}
-                </a>
-            </li>
+            <tr id={"item-"+this.props.data.id}>
+                <td><a onClick={this.handleClick} href=''> {this.props.data.username}</a></td>
+                <td>{this.props.data.first_name}</td>
+                <td>{this.props.data.email}</td>
+            </tr>
         );
     }
 });
@@ -257,7 +263,7 @@ var Form = React.createClass({displayName: 'Form',
     render: function() {
         return (
             <form
-                className="commentForm"
+                className="userForm"
                 onSubmit={this.handleSubmit}
             >
                 <input
@@ -284,7 +290,7 @@ var Form = React.createClass({displayName: 'Form',
                 <input
                     type="text"
                     valueLink={this.linkState('last_name')}
-                    placeholder="Add first name"
+                    placeholder="Add last name"
                     ref="last_name"
                     maxLength="100"
                 />

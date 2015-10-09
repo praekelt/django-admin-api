@@ -10,9 +10,6 @@ from adminapi.tests.models import TestModel
 
 
 class UserSerializer(serializers.ModelSerializer):
-    # Allows the password field to be empty
-    # password = serializers.CharField(allow_null=True)
-
     def create(self, validated_data):
         user = User.objects.create(
             username = validated_data['username'],
@@ -26,6 +23,9 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
     def update(self, instance, validated_data):
+        if validated_data.get('username', None) is None:
+            raise serializers.ValidationError({'username': {'This field is required.'}})
+
         instance.username = validated_data['username']
         instance.first_name = validated_data['first_name']
         instance.last_name = validated_data['last_name']

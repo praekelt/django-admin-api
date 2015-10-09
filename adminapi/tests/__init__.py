@@ -1,4 +1,5 @@
 import base64
+import logging
 
 from django.test import TestCase
 from django.contrib.auth.models import User
@@ -94,7 +95,7 @@ class LoginTest(TestCase):
         self.assertJSONEqual(
             response.content,
             {
-                'detail': "Invalid username/password.",
+                'detail': 'Invalid username/password.',
             }
         )
 
@@ -216,7 +217,7 @@ class CRUDUsersTest(TestCase):
     def tearDownClass(cls):
         super(CRUDUsersTest, cls).tearDownClass()
 
-    def test_permission_success(self):
+    def test_access_success(self):
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
         response = self.client.get(
             '/users/'
@@ -230,20 +231,16 @@ class CRUDUsersTest(TestCase):
         )
         self.assertEqual(response.status_code, 401)
 
-    def test_model_data_retrieve_list_success(self):
-        '''
+    def test_users_data_retrieve_list_success(self):
         self.user = User.objects.create_user(
             username='returnTestUser',
             first_name='first',
             last_name='last',
-            email='tester@foo.com',
+            email='new@foo.com',
             password='password',
         )
         self.user.is_active = True
-        self.user.is_superuser = True
-        self.user.is_staff = True
         self.user.save()
-        '''
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
         response = self.client.get(
            reverse('users-list'),
@@ -253,11 +250,272 @@ class CRUDUsersTest(TestCase):
             response.content,
             [
                 {
-                    'email': 'tester@foo.com',
-                    'first_name': '',
                     'id': 1,
-                    'password': 'bkdf2_sha256$12000$UGEPg7YTW8V2$Mp9iDZKrfhFXRnxGZumFUgxG1qj8H9r88q0F5FsOX/c=',
-                    'username': 'Super'
+                    'username': 'Super',
+                    'first_name': '',
+                    'last_name': '',
+                    'email': 'tester@foo.com'
+                },
+                {
+                    'id': 2,
+                    'username': 'returnTestUser',
+                    'first_name': 'first',
+                    'last_name': 'last',
+                    'email': 'new@foo.com'
                 }
             ]
+        )
+
+    def test_users_data_retrieve_list_denied(self):
+        self.user = User.objects.create_user(
+            username='returnTestUser',
+            first_name='first',
+            last_name='last',
+            email='tester@foo.com',
+            password='password',
+        )
+        self.user.is_active = True
+        self.user.save()
+        self.token = Token.objects.create(user=self.user)
+        self.token.save()
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+        response = self.client.get(
+           reverse('users-list'),
+        )
+        self.assertEqual(response.status_code, 403)
+
+    def test_users_data_retrieve_user_success(self):
+        self.user = User.objects.create_user(
+            username='returnTestUser',
+            first_name='first',
+            last_name='last',
+            email='tester@foo.com',
+            password='password',
+        )
+        self.user.is_active = True
+        self.user.save()
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+        response = self.client.get(
+           reverse('users-detail', args=[2]),
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(
+            response.content,
+            {
+                'id': 2,
+                'username': 'returnTestUser',
+                'first_name': 'first',
+                'last_name': 'last',
+                'email': 'tester@foo.com'
+            }
+        )
+
+    def test_user_data_creation_success(self):
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+        response = self.client.post(
+            reverse('users-list'),
+            {
+                'username': 'APIUser',
+                'password': 'APIpass',
+                'first_name': 'John',
+                'last_name': 'Deer',
+                'email' : 'api@restfull.django'
+            }
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(
+            response.content,
+            {
+                'id': 2,
+                'username': 'APIUser',
+                'first_name': 'John',
+                'last_name': 'Deer',
+                'email' : 'api@restfull.django'
+            }
+        )
+
+    def test_user_data_creation_denied(self):
+        self.user = User.objects.create_user(
+            username='returnTestUser',
+            first_name='first',
+            last_name='last',
+            email='tester@foo.com',
+            password='password',
+        )
+        self.user.is_active = True
+        self.user.save()
+        self.token = Token.objects.create(user=self.user)
+        self.token.save()
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+        response = self.client.post(
+            reverse('users-list'),
+            {
+                'username': 'APIUser',
+                'password': 'APIpass',
+                'first_name': 'John',
+                'last_name': 'Deer',
+                'email' : 'api@restfull.django'
+            }
+        )
+        self.assertEqual(response.status_code, 403)
+
+    def test_user_data_delete_success(self):
+        self.user = User.objects.create_user(
+            username='returnTestUser',
+            first_name='first',
+            last_name='last',
+            email='tester@foo.com',
+            password='password',
+        )
+        self.user.is_active = True
+        self.user.save()
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+        response = self.client.delete(
+            reverse('users-detail', args=[2])
+        )
+        self.assertEqual(response.status_code, 204)
+        response = self.client.get(
+            reverse('users-list'),
+        )
+        self.assertJSONEqual(
+            response.content,
+            [
+                {
+                    'id': 1,
+                    'username': 'Super',
+                    'first_name': '',
+                    'last_name': '',
+                    'email': 'tester@foo.com'
+                }
+            ]
+        )
+
+    def test_user_data_update_success(self):
+        self.user = User.objects.create_user(
+            username='returnTestUser',
+            first_name='first',
+            last_name='last',
+            email='tester@foo.com',
+            password='password',
+        )
+        self.user.is_active = True
+        self.user.save()
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+        response = self.client.put(
+            reverse('users-detail', args=[2]),
+            {
+                'username': 'APIUser',
+                'password': 'APIpass',
+                'first_name': 'John',
+                'last_name': 'Deer',
+                'email' : 'api@restfull.django'
+            }
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(
+            response.content,
+            {
+                'id': 2,
+                'username': 'APIUser',
+                'first_name': 'John',
+                'last_name': 'Deer',
+                'email' : 'api@restfull.django'
+            }
+        )
+    def test_user_data_update_denied(self):
+        self.user = User.objects.create_user(
+            username='returnTestUser',
+            first_name='first',
+            last_name='last',
+            email='tester@foo.com',
+            password='password',
+        )
+        self.user.is_active = True
+        self.user.save()
+        self.token = Token.objects.create(user=self.user)
+        self.token.save()
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+        response = self.client.put(
+            reverse('users-detail', args=[2]),
+            {
+                'username': 'APIUser',
+                'password': 'APIpass',
+                'first_name': 'John',
+                'last_name': 'Deer',
+                'email' : 'api@restfull.django'
+            }
+        )
+        self.assertEqual(response.status_code, 403)
+
+    def test_user_data_creation_field_error_responses(self):
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+        response = self.client.post(
+            reverse('users-list'),
+            {
+            }
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertJSONEqual(
+            response.content,
+            {
+                'username': ['This field is required.'],
+                'password': ['This field is required.']
+            }
+        )
+        response = self.client.post(
+            reverse('users-list'),
+            {
+                'username': 'Super'
+            }
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertJSONEqual(
+            response.content,
+            {
+                'username': ['This field must be unique.'],
+                'password': ['This field is required.']
+            }
+        )
+        response = self.client.post(
+            reverse('users-list'),
+            {
+                'username': 'Super',
+                'password': 'test'
+            }
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertJSONEqual(
+            response.content,
+            {
+                'username': ['This field must be unique.']
+            }
+        )
+
+    def test_user_data_update_field_error_responses(self):
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+        response = self.client.put(
+            reverse('users-detail', args=[1]),
+            {
+            }
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertJSONEqual(
+            response.content,
+            {
+                'username': ['This field is required.']
+            }
+        )
+        response = self.client.post(
+            reverse('users-list'),
+            {
+                'username': 'Super'
+            }
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertJSONEqual(
+            response.content,
+            {
+                'username': ['This field must be unique.'],
+                'password': ['This field is required.']
+            }
         )
