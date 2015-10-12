@@ -12,10 +12,10 @@ input {
     margin: 10px;
     display: inline-table;
 }
-.loginContainer {
+#login {
     position: absolute;
     margin-left: 50%;
     margin-right: 50%;
     margin-top: 20%;
-    border:1px solid #000000;
+    border: 1px solid #000000;
 }

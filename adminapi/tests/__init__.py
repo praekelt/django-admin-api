@@ -422,6 +422,7 @@ class CRUDUsersTest(TestCase):
                 'email' : 'api@restfull.django'
             }
         )
+
     def test_user_data_update_denied(self):
         self.user = User.objects.create_user(
             username='returnTestUser',

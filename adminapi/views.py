@@ -49,7 +49,7 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response(user)
 
 class LoginView(APIView):
-    authentication_classes = (BasicAuthentication, )
+    authentication_classes = (BasicAuthentication,)
 
     def post(self, request, format=None):
         user = request.user

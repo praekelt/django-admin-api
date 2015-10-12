@@ -220,12 +220,6 @@ var Form = React.createClass({displayName: 'Form',
                     email: email
                 });
             } else{
-                /*
-                if(password.length < 6) {
-                    alert('Password minimum length should be 6 characters');
-                    return;
-                }
-                */
                 this.props.onUpdate({
                     id: this.props.data.id,
                     username: username,
