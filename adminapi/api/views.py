@@ -10,10 +10,9 @@ from rest_framework import serializers
 from rest_framework import viewsets, versioning
 
 from adminapi.api.serializers import UserSerializer, GenericSerializer
-from adminapi.tests.models import TestModel
 from adminapi.api import registry
 
-import pdb
+
 class UserViewSet(viewsets.ModelViewSet):
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAdminUser,)
@@ -60,16 +59,3 @@ class LoginView(APIView):
             "token": token.key,
             "username": request.user.username
          })
-
-
-class GenericViewSet(viewsets.ModelViewSet):
-    """ Generic viewset that when configured should be able to obtain
-    models and serialize them at run time
-    At this time it is hardcoded to obtain and serialize:
-    adminapi.tests.models.TestModel
-    """
-    model = registry.model_registry['TestModel']
-    queryset = model.objects.all()
-    serializer = GenericSerializer
-    serializer.Meta.model = model
-    serializer_class = serializer

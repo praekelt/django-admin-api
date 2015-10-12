@@ -7,7 +7,6 @@ from adminapi.api import views
 
 
 router = DefaultRouter()
-router.register(r'generic', views.GenericViewSet, base_name='generic')
 router.register(r'users', views.UserViewSet, base_name='users')
 
 urlpatterns = patterns(
