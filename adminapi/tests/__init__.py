@@ -2,16 +2,21 @@ import base64
 import logging
 
 from django.test import TestCase
+from django.db import models
 from django.contrib.auth.models import User
 from django.test import RequestFactory
-from django.db import models
 from django.core.urlresolvers import reverse
 
 from rest_framework.test import APIRequestFactory, APIClient
 from rest_framework.authtoken.models import Token
 
 from adminapi.api.views import LoginView
-from adminapi.tests.models import TestModel
+
+
+class TestModel(models.Model):
+    test_editable_field = models.CharField(max_length=32)
+    test_non_editable_field = models.CharField(max_length=32, editable=False)
+models.register_models('tests', TestModel)
 
 
 class TrivialTest(TestCase):
@@ -60,7 +65,6 @@ class LoginTest(TestCase):
         cls.user.save()
         cls.token = Token.objects.create(user=cls.user)
         cls.token.save()
-        cls.test_model = TestModel()
         super(LoginTest, cls).setUpClass()
 
     @classmethod
@@ -98,73 +102,6 @@ class LoginTest(TestCase):
                 'detail': 'Invalid username/password.',
             }
         )
-
-    def test_model_data_creation_success(self):
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
-        response = self.client.post(
-            reverse('generic-list'),
-            {
-                'test_editable_field': 'Test Chars',
-            }
-        )
-        self.assertEqual(response.status_code, 201)
-        self.assertJSONEqual(
-            response.content,
-            {
-                'id': 1,
-                'test_editable_field': 'Test Chars',
-                'test_non_editable_field': '',
-            }
-        )
-
-    def test_model_data_retrieve_list_success(self):
-        self.test_model.test_editable_field = 'Retrieve Test'
-        self.test_model.save()
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
-        response = self.client.get(
-           reverse('generic-list'),
-        )
-        self.assertEqual(response.status_code, 200)
-        self.assertJSONEqual(
-            response.content,
-            [
-                {
-                    'id': 1,
-                    'test_editable_field': 'Retrieve Test',
-                    'test_non_editable_field': '',
-                }
-            ]
-        )
-
-    def test_model_data_update_success(self):
-        self.test_model.test_editable_field = 'Update Test'
-        self.test_model.save()
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
-        response = self.client.put(
-            reverse('generic-detail', args=[1]),
-            {
-                'id': 1,
-                'test_editable_field': 'Changed data',
-            }
-        )
-        self.assertEqual(response.status_code, 200)
-        self.assertJSONEqual(
-            response.content,
-            {
-                'id': 1,
-                'test_editable_field': 'Changed data',
-                'test_non_editable_field': '',
-            }
-        )
-
-    def test_model_data_delete_success(self):
-        self.test_model.test_editable_field = 'Delete Test'
-        self.test_model.save()
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
-        response = self.client.delete(
-            reverse('generic-detail', args=[1]),
-        )
-        self.assertEqual(response.status_code, 204)
 
 
 class CRUDUsersTest(TestCase):
