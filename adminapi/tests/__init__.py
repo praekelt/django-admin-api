@@ -76,7 +76,7 @@ class LoginTest(TestCase):
             HTTP_AUTHORIZATION='Basic ' + base64.b64encode('tester:test1pass')
         )
         response = self.client.post(
-            reverse('login')
+            reverse('api:login')
         )
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(
@@ -93,7 +93,7 @@ class LoginTest(TestCase):
             HTTP_AUTHORIZATION='Basic ' + base64.b64encode('wrong:creds')
         )
         response = self.client.post(
-           reverse('login')
+           reverse('api:login')
         )
         self.assertEqual(response.status_code, 401)
         self.assertJSONEqual(
@@ -131,14 +131,14 @@ class CRUDUsersTest(TestCase):
     def test_access_success(self):
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
         response = self.client.get(
-            reverse('users-list')
+            reverse('api:users-list')
         )
         self.assertEqual(response.status_code, 200)
 
     def test_access_denied(self):
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + 'Wr0ngT0k3n')
         response = self.client.get(
-            reverse('users-list')
+            reverse('api:users-list')
         )
         self.assertEqual(response.status_code, 401)
 
@@ -154,7 +154,7 @@ class CRUDUsersTest(TestCase):
         self.user.save()
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
         response = self.client.get(
-           reverse('users-list'),
+           reverse('api:users-list'),
         )
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(
@@ -191,7 +191,7 @@ class CRUDUsersTest(TestCase):
         self.token.save()
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
         response = self.client.get(
-           reverse('users-list'),
+           reverse('api:users-list'),
         )
         self.assertEqual(response.status_code, 403)
 
@@ -207,7 +207,7 @@ class CRUDUsersTest(TestCase):
         self.user.save()
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
         response = self.client.get(
-           reverse('users-detail', args=[2]),
+           reverse('api:users-detail', args=[2]),
         )
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(
@@ -224,7 +224,7 @@ class CRUDUsersTest(TestCase):
     def test_user_data_creation_success(self):
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
         response = self.client.post(
-            reverse('users-list'),
+            reverse('api:users-list'),
             {
                 'username': 'APIUser',
                 'password': 'APIpass',
@@ -259,7 +259,7 @@ class CRUDUsersTest(TestCase):
         self.token.save()
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
         response = self.client.post(
-            reverse('users-list'),
+            reverse('api:users-list'),
             {
                 'username': 'APIUser',
                 'password': 'APIpass',
@@ -282,11 +282,11 @@ class CRUDUsersTest(TestCase):
         self.user.save()
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
         response = self.client.delete(
-            reverse('users-detail', args=[2])
+            reverse('api:users-detail', args=[2])
         )
         self.assertEqual(response.status_code, 204)
         response = self.client.get(
-            reverse('users-list'),
+            reverse('api:users-list'),
         )
         self.assertJSONEqual(
             response.content,
@@ -313,7 +313,7 @@ class CRUDUsersTest(TestCase):
         self.user.save()
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
         response = self.client.put(
-            reverse('users-detail', args=[2]),
+            reverse('api:users-detail', args=[2]),
             {
                 'username': 'APIUser',
                 'password': 'APIpass',
@@ -348,7 +348,7 @@ class CRUDUsersTest(TestCase):
         self.token.save()
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
         response = self.client.put(
-            reverse('users-detail', args=[2]),
+            reverse('api:users-detail', args=[2]),
             {
                 'username': 'APIUser',
                 'password': 'APIpass',
@@ -362,7 +362,7 @@ class CRUDUsersTest(TestCase):
     def test_user_data_creation_field_error_responses(self):
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
         response = self.client.post(
-            reverse('users-list'),
+            reverse('api:users-list'),
             {
             }
         )
@@ -375,7 +375,7 @@ class CRUDUsersTest(TestCase):
             }
         )
         response = self.client.post(
-            reverse('users-list'),
+            reverse('api:users-list'),
             {
                 'username': 'Super'
             }
@@ -389,7 +389,7 @@ class CRUDUsersTest(TestCase):
             }
         )
         response = self.client.post(
-            reverse('users-list'),
+            reverse('api:users-list'),
             {
                 'username': 'Super',
                 'password': 'test'
@@ -406,7 +406,7 @@ class CRUDUsersTest(TestCase):
     def test_user_data_update_field_error_responses(self):
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
         response = self.client.put(
-            reverse('users-detail', args=[1]),
+            reverse('api:users-detail', args=[1]),
             {
             }
         )
@@ -418,7 +418,7 @@ class CRUDUsersTest(TestCase):
             }
         )
         response = self.client.post(
-            reverse('users-list'),
+            reverse('api:users-list'),
             {
                 'username': 'Super'
             }
