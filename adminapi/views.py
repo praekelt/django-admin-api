@@ -13,7 +13,7 @@ from adminapi.serializers import UserSerializer, GenericSerializer
 from adminapi.tests.models import TestModel
 from adminapi import registry
 
-import pdb
+
 class UserViewSet(viewsets.ModelViewSet):
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAdminUser,)
@@ -47,6 +47,7 @@ class UserViewSet(viewsets.ModelViewSet):
         user = serializer.data
         del user['password']
         return Response(user)
+
 
 class LoginView(APIView):
     authentication_classes = (BasicAuthentication,)

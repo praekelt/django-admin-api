@@ -22,7 +22,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.request',
 )
 
-ROOT_URLCONF = 'adminapi.urls'
+ROOT_URLCONF = 'adminapi.tests.urls'
 
 # xxx: get tests to pass with migrations
 SOUTH_TESTS_MIGRATE = False
