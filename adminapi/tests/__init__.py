@@ -10,7 +10,7 @@ from django.core.urlresolvers import reverse
 from rest_framework.test import APIRequestFactory, APIClient
 from rest_framework.authtoken.models import Token
 
-from adminapi.views import LoginView, TestView
+from adminapi.api.views import LoginView
 from adminapi.tests.models import TestModel
 
 
@@ -72,7 +72,7 @@ class LoginTest(TestCase):
             HTTP_AUTHORIZATION='Basic ' + base64.b64encode('tester:test1pass')
         )
         response = self.client.post(
-            '/login/'
+            reverse('login')
         )
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(
@@ -89,39 +89,13 @@ class LoginTest(TestCase):
             HTTP_AUTHORIZATION='Basic ' + base64.b64encode('wrong:creds')
         )
         response = self.client.post(
-            '/login/'
+           reverse('login')
         )
         self.assertEqual(response.status_code, 401)
         self.assertJSONEqual(
             response.content,
             {
                 'detail': 'Invalid username/password.',
-            }
-        )
-
-    def test_token_auth_success(self):
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
-        response = self.client.get(
-            '/test/'
-        )
-        self.assertEqual(response.status_code, 200)
-        self.assertJSONEqual(
-            response.content,
-            {
-                'detail': 'Auth Token Valid',
-            }
-        )
-
-    def test_token_auth_fail(self):
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + 'Wr0ngT0k3n')
-        response = self.client.get(
-            '/test/'
-        )
-        self.assertEqual(response.status_code, 401)
-        self.assertJSONEqual(
-            response.content,
-            {
-                'detail': 'Invalid token.',
             }
         )
 
@@ -220,14 +194,14 @@ class CRUDUsersTest(TestCase):
     def test_access_success(self):
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
         response = self.client.get(
-            '/users/'
+            reverse('users-list')
         )
         self.assertEqual(response.status_code, 200)
 
     def test_access_denied(self):
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + 'Wr0ngT0k3n')
         response = self.client.get(
-            '/users/'
+            reverse('users-list')
         )
         self.assertEqual(response.status_code, 401)
 
