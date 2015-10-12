@@ -52,6 +52,7 @@ var FormContainer = React.createClass({displayName: 'ReactForm',
             success: function(data) {
                 console.log('Submit success')
                 alert('Successfully submitted');
+                this.retrieveData();
             }.bind(this),
             error: function(xhr, status, err) {
                 console.warn(xhr.responseText);
@@ -73,6 +74,7 @@ var FormContainer = React.createClass({displayName: 'ReactForm',
             success: function(data) {
                 console.log('Update success');
                 alert('Successfully updated');
+                this.retrieveData();
             }.bind(this),
             error: function(xhr, status, err) {
                 jsonError = JSON.parse(xhr.responseText);
@@ -93,6 +95,7 @@ var FormContainer = React.createClass({displayName: 'ReactForm',
             success: function(data) {
                 alert('Successfully deleted');
                 console.log('Delete success');
+                this.retrieveData();
             }.bind(this),
             error: function(xhr, status, err) {
                 console.error(xhr.responseText);
