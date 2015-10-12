@@ -1,0 +1,36 @@
+body {
+    font-family: Helvetica, sans-serif;
+    color: #413c32;
+    background-color: #DEDEDE;
+    box-sizing: border-box;
+    display: block;
+}
+.form-container {
+    width: 90%;
+    border: 1px solid #947B49;
+    background-color: #D2D2D2;
+    font-size: 10px;
+    padding: 4px;
+    display: inline-block;
+}
+table.userTable {
+    width:100%;
+    border:1px solid #000000;
+    border-collapse: collapse;
+}
+table.userTable th, td {
+    border:1px solid #000000;
+}
+form.userForm {
+}
+input {
+    padding: 5px;
+    margin: 5px;
+    display: block;
+}
+input[type="button"] {
+    display: inline-block;
+}
+input[type="submit"] {
+    display: inline-block;
+}
