@@ -582,7 +582,6 @@ class ForeignKeyModelsTest(TestCase):
             self.foreign_key_test_model_1.foreign_single_relation.title,
             "ForeignRelation 1"
         )
-        pdb.set_trace()
         self.assertEqual(
             self.foreign_key_test_model_1.many_relations.values("title"),
             [
@@ -656,7 +655,6 @@ class ForeignKeyModelsTest(TestCase):
             reverse("foreign-keys-detail", args=[1])
         )
         self.assertEqual(response.status_code, 200)
-        pdb.set_trace()
         self.assertJSONEqual(
             response.content,
             {
