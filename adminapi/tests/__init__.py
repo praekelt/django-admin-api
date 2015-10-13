@@ -1,4 +1,4 @@
-import base64, pdb, logging
+import base64
 
 from django.test import TestCase
 from django.db import models
@@ -8,14 +8,6 @@ from django.core.urlresolvers import reverse
 
 from rest_framework.test import APIRequestFactory, APIClient
 from rest_framework.authtoken.models import Token
-
-from adminapi.api.views import LoginView
-
-
-class TestModel(models.Model):
-    test_editable_field = models.CharField(max_length=32)
-    test_non_editable_field = models.CharField(max_length=32, editable=False)
-models.register_models('tests', TestModel)
 
 
 class ForeignSingleRelation(models.Model):
@@ -27,6 +19,7 @@ class ForeignSingleRelation(models.Model):
 
     def __unicode__(self):
         return self.title
+models.register_models('tests', ForeignSingleRelation)
 
 
 class ForeignKeyTestModel(models.Model):
@@ -40,6 +33,7 @@ class ForeignKeyTestModel(models.Model):
 
     def __unicode__(self):
         return self.title
+models.register_models('tests', ForeignKeyTestModel)
 
 
 class ForeignManyRelation(models.Model):
@@ -49,35 +43,7 @@ class ForeignManyRelation(models.Model):
 
     def __unicode__(self):
         return self.title
-
-
-class TrivialTest(TestCase):
-
-    @classmethod
-    def setUpClass(cls):
-        cls.obj = models.TestModel()
-        cls.obj.save()
-
-    @classmethod
-    def tearDownClass(cls):
-        super(TrivialTest, cls).tearDownClass()
-
-    def test_trivial_true(self):
-        test_var = True
-        self.assertEqual(test_var, True)
-
-    def test_model_instantiation(self):
-        self.assertIsNotNone(self.obj)
-
-    def test_model_fields_success(self):
-        self.obj.test_editable_field = "Test chars"
-        self.obj.save()
-        self.assertEqual(self.obj.test_editable_field, "Test chars")
-
-    def test_model_fields_fail(self):
-        self.obj.test_editable_field = "Test chars"
-        self.obj.save()
-        self.assertNotEqual(self.obj.test_editable_field, "Not correct")
+models.register_models('tests', ForeignManyRelation)
 
 
 class LoginTest(TestCase):
@@ -97,10 +63,6 @@ class LoginTest(TestCase):
         cls.user.save()
         cls.token = Token.objects.create(user=cls.user)
         cls.token.save()
-<<<<<<< HEAD
-        cls.test_model = models.TestModel()
-=======
->>>>>>> develop
         super(LoginTest, cls).setUpClass()
 
     @classmethod
@@ -112,11 +74,7 @@ class LoginTest(TestCase):
             HTTP_AUTHORIZATION="Basic " + base64.b64encode("tester:test1pass")
         )
         response = self.client.post(
-<<<<<<< HEAD
-            reverse("login")
-=======
             reverse('api:login')
->>>>>>> develop
         )
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(
@@ -133,11 +91,7 @@ class LoginTest(TestCase):
             HTTP_AUTHORIZATION="Basic " + base64.b64encode("wrong:creds")
         )
         response = self.client.post(
-<<<<<<< HEAD
-            reverse("login"),
-=======
            reverse('api:login')
->>>>>>> develop
         )
         self.assertEqual(response.status_code, 401)
         self.assertJSONEqual(
@@ -147,102 +101,6 @@ class LoginTest(TestCase):
             }
         )
 
-<<<<<<< HEAD
-    def test_token_auth_success(self):
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
-        response = self.client.get(
-            reverse("test"),
-        )
-        self.assertEqual(response.status_code, 200)
-        self.assertJSONEqual(
-            response.content,
-            {
-                "detail": "Auth Token Valid",
-            }
-        )
-
-    def test_token_auth_fail(self):
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + "Wr0ngT0k3n")
-        response = self.client.get(
-            reverse("test")
-        )
-        self.assertEqual(response.status_code, 401)
-        self.assertJSONEqual(
-            response.content,
-            {
-                "detail": "Invalid token.",
-            }
-        )
-
-    def test_model_data_creation_success(self):
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
-        response = self.client.post(
-            reverse("generic-list"),
-            {
-                "test_editable_field": "Test Chars",
-            }
-        )
-        self.assertEqual(response.status_code, 201)
-        self.assertJSONEqual(
-            response.content,
-            {
-                "id": 1,
-                "test_editable_field": "Test Chars",
-                "test_non_editable_field": "",
-            }
-        )
-
-    def test_model_data_retrieve_list_success(self):
-        self.test_model.test_editable_field = "Retrieve Test"
-        self.test_model.save()
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
-        response = self.client.get(
-           reverse("generic-list"),
-        )
-        self.assertEqual(response.status_code, 200)
-        self.assertJSONEqual(
-            response.content,
-            [
-                {
-                    "id": 1,
-                    "test_editable_field": "Retrieve Test",
-                    "test_non_editable_field": "",
-                }
-            ]
-        )
-
-    def test_model_data_update_success(self):
-        self.test_model.test_editable_field = "Update Test"
-        self.test_model.save()
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
-        response = self.client.put(
-            reverse("generic-detail", args=[1]),
-            {
-                "id": 1,
-                "test_editable_field": "Changed data",
-            }
-        )
-        self.assertEqual(response.status_code, 200)
-        self.assertJSONEqual(
-            response.content,
-            {
-                "id": 1,
-                "test_editable_field": "Changed data",
-                "test_non_editable_field": "",
-            }
-        )
-
-    def test_model_data_delete_success(self):
-        self.test_model.test_editable_field = "Delete Test"
-        self.test_model.save()
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
-        response = self.client.delete(
-            reverse("generic-detail", args=[1]),
-        )
-        self.assertEqual(response.status_code, 204)
-
-=======
->>>>>>> develop
 
 class CRUDUsersTest(TestCase):
 
@@ -271,22 +129,14 @@ class CRUDUsersTest(TestCase):
     def test_access_success(self):
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
         response = self.client.get(
-<<<<<<< HEAD
-            reverse("users-list")
-=======
             reverse('api:users-list')
->>>>>>> develop
         )
         self.assertEqual(response.status_code, 200)
 
     def test_access_denied(self):
         self.client.credentials(HTTP_AUTHORIZATION="Token " + "Wr0ngT0k3n")
         response = self.client.get(
-<<<<<<< HEAD
-            reverse("users-list")
-=======
             reverse('api:users-list')
->>>>>>> develop
         )
         self.assertEqual(response.status_code, 401)
 
@@ -302,11 +152,7 @@ class CRUDUsersTest(TestCase):
         self.user.save()
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
         response = self.client.get(
-<<<<<<< HEAD
-           reverse("users-list"),
-=======
            reverse('api:users-list'),
->>>>>>> develop
         )
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(
@@ -343,11 +189,7 @@ class CRUDUsersTest(TestCase):
         self.token.save()
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
         response = self.client.get(
-<<<<<<< HEAD
-           reverse("users-list"),
-=======
            reverse('api:users-list'),
->>>>>>> develop
         )
         self.assertEqual(response.status_code, 403)
 
@@ -363,11 +205,7 @@ class CRUDUsersTest(TestCase):
         self.user.save()
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
         response = self.client.get(
-<<<<<<< HEAD
-           reverse("users-detail", args=[2]),
-=======
            reverse('api:users-detail', args=[2]),
->>>>>>> develop
         )
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(
@@ -384,11 +222,7 @@ class CRUDUsersTest(TestCase):
     def test_user_data_creation_success(self):
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
         response = self.client.post(
-<<<<<<< HEAD
-            reverse("users-list"),
-=======
             reverse('api:users-list'),
->>>>>>> develop
             {
                 "username": "APIUser",
                 "password": "APIpass",
@@ -423,11 +257,7 @@ class CRUDUsersTest(TestCase):
         self.token.save()
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
         response = self.client.post(
-<<<<<<< HEAD
-            reverse("users-list"),
-=======
             reverse('api:users-list'),
->>>>>>> develop
             {
                 "username": "APIUser",
                 "password": "APIpass",
@@ -450,19 +280,11 @@ class CRUDUsersTest(TestCase):
         self.user.save()
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
         response = self.client.delete(
-<<<<<<< HEAD
-            reverse("users-detail", args=[2])
-        )
-        self.assertEqual(response.status_code, 204)
-        response = self.client.get(
-            reverse("users-list"),
-=======
             reverse('api:users-detail', args=[2])
         )
         self.assertEqual(response.status_code, 204)
         response = self.client.get(
             reverse('api:users-list'),
->>>>>>> develop
         )
         self.assertJSONEqual(
             response.content,
@@ -489,11 +311,7 @@ class CRUDUsersTest(TestCase):
         self.user.save()
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
         response = self.client.put(
-<<<<<<< HEAD
-            reverse("users-detail", args=[2]),
-=======
             reverse('api:users-detail', args=[2]),
->>>>>>> develop
             {
                 "username": "APIUser",
                 "password": "APIpass",
@@ -528,11 +346,7 @@ class CRUDUsersTest(TestCase):
         self.token.save()
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
         response = self.client.put(
-<<<<<<< HEAD
-            reverse("users-detail", args=[2]),
-=======
             reverse('api:users-detail', args=[2]),
->>>>>>> develop
             {
                 "username": "APIUser",
                 "password": "APIpass",
@@ -546,11 +360,7 @@ class CRUDUsersTest(TestCase):
     def test_user_data_creation_field_error_responses(self):
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
         response = self.client.post(
-<<<<<<< HEAD
-            reverse("users-list"),
-=======
             reverse('api:users-list'),
->>>>>>> develop
             {
             }
         )
@@ -563,11 +373,7 @@ class CRUDUsersTest(TestCase):
             }
         )
         response = self.client.post(
-<<<<<<< HEAD
-            reverse("users-list"),
-=======
             reverse('api:users-list'),
->>>>>>> develop
             {
                 "username": "Super"
             }
@@ -581,11 +387,7 @@ class CRUDUsersTest(TestCase):
             }
         )
         response = self.client.post(
-<<<<<<< HEAD
-            reverse("users-list"),
-=======
             reverse('api:users-list'),
->>>>>>> develop
             {
                 "username": "Super",
                 "password": "test"
@@ -602,11 +404,7 @@ class CRUDUsersTest(TestCase):
     def test_user_data_update_field_error_responses(self):
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
         response = self.client.put(
-<<<<<<< HEAD
-            reverse("users-detail", args=[1]),
-=======
             reverse('api:users-detail', args=[1]),
->>>>>>> develop
             {
             }
         )
@@ -618,11 +416,7 @@ class CRUDUsersTest(TestCase):
             }
         )
         response = self.client.post(
-<<<<<<< HEAD
-            reverse("users-list"),
-=======
             reverse('api:users-list'),
->>>>>>> develop
             {
                 "username": "Super"
             }
@@ -644,29 +438,29 @@ class ForeignKeyModelsTest(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.foreign_single_relation = models.ForeignSingleRelation()
+        cls.foreign_single_relation = ForeignSingleRelation()
         cls.foreign_single_relation.title = "ForeignRelation 1"
         cls.foreign_single_relation.save()
 
-        cls.foreign_key_test_model_1 = models.ForeignKeyTestModel()
+        cls.foreign_key_test_model_1 = ForeignKeyTestModel()
         cls.foreign_key_test_model_1.title = "TestModel 1"
         cls.foreign_key_test_model_1.foreign_single_relation = \
             cls.foreign_single_relation
         cls.foreign_key_test_model_1.save()
-        cls.foreign_key_test_model_2 = models.ForeignKeyTestModel()
+        cls.foreign_key_test_model_2 = ForeignKeyTestModel()
         cls.foreign_key_test_model_2.title = "TestModel 2"
         cls.foreign_key_test_model_2.foreign_single_relation = \
             cls.foreign_single_relation
         cls.foreign_key_test_model_2.save()
 
-        cls.foreign_many_relation_1 = models.ForeignManyRelation()
+        cls.foreign_many_relation_1 = ForeignManyRelation()
         cls.foreign_many_relation_1.title = "ForeignManyRelation 1"
         cls.foreign_many_relation_1.save()
         cls.foreign_many_relation_1.foreign_key_test_models.add(
             cls.foreign_key_test_model_1,
             cls.foreign_key_test_model_2
         )
-        cls.foreign_many_relation_2 = models.ForeignManyRelation()
+        cls.foreign_many_relation_2 = ForeignManyRelation()
         cls.foreign_many_relation_2.title = "ForeignManyRelation 2"
         cls.foreign_many_relation_2.save()
         cls.foreign_many_relation_2.foreign_key_test_models.add(
@@ -782,7 +576,7 @@ class ForeignKeyModelsTest(TestCase):
         )
 
     def test_foreign_key_model_api_update_success(self):
-        self.foreign_single_relation = models.ForeignSingleRelation()
+        self.foreign_single_relation = ForeignSingleRelation()
         self.foreign_single_relation.title = "ForeignRelation 2"
         self.foreign_single_relation.save()
         response = self.client.put(

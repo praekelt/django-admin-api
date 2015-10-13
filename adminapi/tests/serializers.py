@@ -1,11 +1,11 @@
 from rest_framework import serializers
 
-from adminapi.tests import models
+from adminapi import tests
 
 
 class ManyRelationSerializer(serializers.ModelSerializer):
     class Meta:
-        model = models.ForeignManyRelation
+        model = tests.ForeignManyRelation
         fields = (
             "title",
         )

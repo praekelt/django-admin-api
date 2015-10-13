@@ -1,10 +1,11 @@
 from rest_framework import viewsets, generics
 
-from adminapi.tests import models, serializers
+from adminapi import tests
+from adminapi.tests import serializers
 
 
 class ForeginKeyViewSet(viewsets.ModelViewSet):
-    model = models.ForeignKeyTestModel
+    model = tests.ForeignKeyTestModel
     queryset = model.objects.all()
     serializer = serializers.ForeignModelSerializer
     serializer.Meta.model = model
