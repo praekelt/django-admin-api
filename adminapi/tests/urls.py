@@ -5,7 +5,11 @@ from rest_framework.routers import DefaultRouter
 from adminapi.tests import views
 
 router = DefaultRouter()
-router.register(r'foreign_keys', views.ForeginKeyViewSet, base_name='foreign-keys')
+router.register(
+    r'foreign_keys',
+    views.ForeignKeyViewSet,
+    base_name='foreign-keys'
+)
 
 urlpatterns = patterns(
     "",

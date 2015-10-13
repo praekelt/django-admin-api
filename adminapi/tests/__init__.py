@@ -19,7 +19,7 @@ class ForeignSingleRelation(models.Model):
 
     def __unicode__(self):
         return self.title
-models.register_models('tests', ForeignSingleRelation)
+models.register_models("tests", ForeignSingleRelation)
 
 
 class ForeignKeyTestModel(models.Model):
@@ -33,17 +33,20 @@ class ForeignKeyTestModel(models.Model):
 
     def __unicode__(self):
         return self.title
-models.register_models('tests', ForeignKeyTestModel)
+models.register_models("tests", ForeignKeyTestModel)
 
 
 class ForeignManyRelation(models.Model):
     title = models.CharField(max_length=100)
     # Many to many relations
-    foreign_key_test_models = models.ManyToManyField(ForeignKeyTestModel)
+    foreign_key_test_models = models.ManyToManyField(
+        ForeignKeyTestModel,
+        related_name="foreign_many_relation"
+    )
 
     def __unicode__(self):
         return self.title
-models.register_models('tests', ForeignManyRelation)
+models.register_models("tests", ForeignManyRelation)
 
 
 class LoginTest(TestCase):
@@ -74,7 +77,7 @@ class LoginTest(TestCase):
             HTTP_AUTHORIZATION="Basic " + base64.b64encode("tester:test1pass")
         )
         response = self.client.post(
-            reverse('api:login')
+            reverse("api:login")
         )
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(
@@ -91,7 +94,7 @@ class LoginTest(TestCase):
             HTTP_AUTHORIZATION="Basic " + base64.b64encode("wrong:creds")
         )
         response = self.client.post(
-           reverse('api:login')
+           reverse("api:login")
         )
         self.assertEqual(response.status_code, 401)
         self.assertJSONEqual(
@@ -129,14 +132,14 @@ class CRUDUsersTest(TestCase):
     def test_access_success(self):
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
         response = self.client.get(
-            reverse('api:users-list')
+            reverse("api:users-list")
         )
         self.assertEqual(response.status_code, 200)
 
     def test_access_denied(self):
         self.client.credentials(HTTP_AUTHORIZATION="Token " + "Wr0ngT0k3n")
         response = self.client.get(
-            reverse('api:users-list')
+            reverse("api:users-list")
         )
         self.assertEqual(response.status_code, 401)
 
@@ -152,7 +155,7 @@ class CRUDUsersTest(TestCase):
         self.user.save()
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
         response = self.client.get(
-           reverse('api:users-list'),
+           reverse("api:users-list"),
         )
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(
@@ -189,7 +192,7 @@ class CRUDUsersTest(TestCase):
         self.token.save()
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
         response = self.client.get(
-           reverse('api:users-list'),
+           reverse("api:users-list"),
         )
         self.assertEqual(response.status_code, 403)
 
@@ -205,7 +208,7 @@ class CRUDUsersTest(TestCase):
         self.user.save()
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
         response = self.client.get(
-           reverse('api:users-detail', args=[2]),
+           reverse("api:users-detail", args=[2]),
         )
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(
@@ -222,7 +225,7 @@ class CRUDUsersTest(TestCase):
     def test_user_data_creation_success(self):
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
         response = self.client.post(
-            reverse('api:users-list'),
+            reverse("api:users-list"),
             {
                 "username": "APIUser",
                 "password": "APIpass",
@@ -257,7 +260,7 @@ class CRUDUsersTest(TestCase):
         self.token.save()
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
         response = self.client.post(
-            reverse('api:users-list'),
+            reverse("api:users-list"),
             {
                 "username": "APIUser",
                 "password": "APIpass",
@@ -280,11 +283,11 @@ class CRUDUsersTest(TestCase):
         self.user.save()
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
         response = self.client.delete(
-            reverse('api:users-detail', args=[2])
+            reverse("api:users-detail", args=[2])
         )
         self.assertEqual(response.status_code, 204)
         response = self.client.get(
-            reverse('api:users-list'),
+            reverse("api:users-list"),
         )
         self.assertJSONEqual(
             response.content,
@@ -311,7 +314,7 @@ class CRUDUsersTest(TestCase):
         self.user.save()
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
         response = self.client.put(
-            reverse('api:users-detail', args=[2]),
+            reverse("api:users-detail", args=[2]),
             {
                 "username": "APIUser",
                 "password": "APIpass",
@@ -346,7 +349,7 @@ class CRUDUsersTest(TestCase):
         self.token.save()
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
         response = self.client.put(
-            reverse('api:users-detail', args=[2]),
+            reverse("api:users-detail", args=[2]),
             {
                 "username": "APIUser",
                 "password": "APIpass",
@@ -360,7 +363,7 @@ class CRUDUsersTest(TestCase):
     def test_user_data_creation_field_error_responses(self):
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
         response = self.client.post(
-            reverse('api:users-list'),
+            reverse("api:users-list"),
             {
             }
         )
@@ -373,7 +376,7 @@ class CRUDUsersTest(TestCase):
             }
         )
         response = self.client.post(
-            reverse('api:users-list'),
+            reverse("api:users-list"),
             {
                 "username": "Super"
             }
@@ -387,7 +390,7 @@ class CRUDUsersTest(TestCase):
             }
         )
         response = self.client.post(
-            reverse('api:users-list'),
+            reverse("api:users-list"),
             {
                 "username": "Super",
                 "password": "test"
@@ -404,7 +407,7 @@ class CRUDUsersTest(TestCase):
     def test_user_data_update_field_error_responses(self):
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
         response = self.client.put(
-            reverse('api:users-detail', args=[1]),
+            reverse("api:users-detail", args=[1]),
             {
             }
         )
@@ -416,7 +419,7 @@ class CRUDUsersTest(TestCase):
             }
         )
         response = self.client.post(
-            reverse('api:users-list'),
+            reverse("api:users-list"),
             {
                 "username": "Super"
             }
@@ -460,12 +463,14 @@ class ForeignKeyModelsTest(TestCase):
             cls.foreign_key_test_model_1,
             cls.foreign_key_test_model_2
         )
+        cls.foreign_many_relation_1.save()
         cls.foreign_many_relation_2 = ForeignManyRelation()
         cls.foreign_many_relation_2.title = "ForeignManyRelation 2"
         cls.foreign_many_relation_2.save()
         cls.foreign_many_relation_2.foreign_key_test_models.add(
             cls.foreign_key_test_model_1,
         )
+        cls.foreign_many_relation_2.save()
 
     @classmethod
     def tearDownClass(cls):
@@ -494,11 +499,13 @@ class ForeignKeyModelsTest(TestCase):
             "ForeignRelation 1"
         )
         self.assertEqual(
-            self.foreign_key_test_model_1.many_relations.values("title"),
-            [
-                {"title": "ForeignManyRelation 1"},
-                {"title": "ForeignManyRelation 2"}
-            ]
+            list(
+                self.foreign_key_test_model_1.foreign_many_relation.values_list(
+                    'title',
+                    flat=True
+                )
+            ),
+            [u'ForeignManyRelation 1', u'ForeignManyRelation 2']
         )
         self.assertEqual(self.foreign_key_test_model_2.title, "TestModel 2")
         self.assertEqual(
@@ -522,22 +529,45 @@ class ForeignKeyModelsTest(TestCase):
         )
 
     def test_foreign_key_model_api_response_success(self):
+        # TODO
         response = self.client.get(
             reverse("foreign-keys-list"),
+            **{
+                "HTTP_MODEL_CLASS": "ForeignKeyTestModel",
+                "HTTP_SERIALIZER_CLASS": "ForeignModelSerializer"
+            }
         )
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(
             response.content,
             [
                 {
-                    "foreign_single_relation": 1,
                     "id": 1,
-                    "title": "TestModel 1"
+                    "foreign_many_relation":
+                        [
+                            {
+                                "id": 1,
+                                "title": "ForeignManyRelation 1"
+                            },
+                            {
+                                "id": 2,
+                                "title": "ForeignManyRelation 2"
+                            }
+                        ],
+                    "title": "TestModel 1",
+                    "foreign_single_relation": 1
                 },
                 {
-                    "foreign_single_relation": 1,
                     "id": 2,
-                    "title": "TestModel 2"
+                    "foreign_many_relation":
+                        [
+                            {
+                                "id": 1,
+                                "title": "ForeignManyRelation 1"
+                            }
+                        ],
+                    "title": "TestModel 2",
+                    "foreign_single_relation": 1
                 }
             ]
         )
@@ -548,14 +578,18 @@ class ForeignKeyModelsTest(TestCase):
             {
                 "title": "post_Model",
                 "foreign_single_relation": 1
+            },
+            **{
+                "HTTP_MODEL_CLASS": "ForeignKeyTestModel",
+                "HTTP_SERIALIZER_CLASS": "ForeignModelSerializer"
             }
-
         )
         self.assertEqual(response.status_code, 201)
         self.assertJSONEqual(
             response.content,
             {
                 "foreign_single_relation": 1,
+                "foreign_many_relation": [],
                 "id": 3,
                 "title": "post_Model"
             },
@@ -563,15 +597,30 @@ class ForeignKeyModelsTest(TestCase):
 
     def test_foreign_key_model_api_fetch_detail_success(self):
         response = self.client.get(
-            reverse("foreign-keys-detail", args=[1])
+            reverse("foreign-keys-detail", args=[1]),
+            **{
+                "HTTP_MODEL_CLASS": "ForeignKeyTestModel",
+                "HTTP_SERIALIZER_CLASS": "ForeignModelSerializer"
+            }
         )
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(
             response.content,
             {
-                "foreign_single_relation": 1,
                 "id": 1,
-                "title": "TestModel 1"
+                "foreign_many_relation":
+                    [
+                        {
+                            "id": 1,
+                            "title": "ForeignManyRelation 1"
+                        },
+                        {
+                            "id": 2,
+                            "title": "ForeignManyRelation 2"
+                        }
+                    ],
+                "title": "TestModel 1",
+                "foreign_single_relation": 1
             }
         )
 
@@ -584,35 +633,145 @@ class ForeignKeyModelsTest(TestCase):
             {
                 "title": "Model 1 updated",
                 "foreign_single_relation": 2
+            },
+            **{
+                "HTTP_MODEL_CLASS": "ForeignKeyTestModel",
+                "HTTP_SERIALIZER_CLASS": "ForeignModelSerializer"
             }
-
         )
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(
             response.content,
             {
-                "foreign_single_relation": 2,
                 "id": 1,
-                "title": "Model 1 updated"
-            },
+                "foreign_many_relation":
+                    [
+                        {
+                            "id": 1,
+                            "title": "ForeignManyRelation 1"
+                        },
+                        {
+                            "id": 2,
+                            "title": "ForeignManyRelation 2"
+                        }
+                    ],
+                "title": "Model 1 updated",
+                "foreign_single_relation": 2
+            }
         )
 
     def test_foreign_key_model_api_delete_success(self):
         response = self.client.delete(
             reverse("foreign-keys-detail", args=[1]),
+            **{
+                "HTTP_MODEL_CLASS": "ForeignKeyTestModel",
+                "HTTP_SERIALIZER_CLASS": "ForeignModelSerializer"
+            }
         )
         self.assertEqual(response.status_code, 204)
         response = self.client.get(
             reverse("foreign-keys-list"),
+            **{
+                "HTTP_MODEL_CLASS": "ForeignKeyTestModel",
+                "HTTP_SERIALIZER_CLASS": "ForeignModelSerializer"
+            }
         )
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(
             response.content,
             [
                 {
-                    "foreign_single_relation": 1,
                     "id": 2,
-                    "title": "TestModel 2"
+                    "foreign_many_relation":
+                        [
+                            {
+                                "id": 1,
+                                "title": "ForeignManyRelation 1"
+                            }
+                        ],
+                    "title": "TestModel 2",
+                    "foreign_single_relation": 1
                 }
             ]
+        )
+
+    def test_runtime_assigned_model_list(self):
+        response = self.client.get(
+            reverse("foreign-keys-list"),
+            **{
+                "HTTP_MODEL_CLASS": "ForeignKeyTestModel",
+                "HTTP_SERIALIZER_CLASS": "GenericSerializer"
+            }
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(
+            response.content,
+            [
+                {
+                    "id": 1,
+                    "title": "TestModel 1",
+                    "foreign_single_relation": 1
+                },
+                {
+                    "id": 2,
+                    "title": "TestModel 2",
+                    "foreign_single_relation": 1
+                }
+            ]
+        )
+
+    def test_runtime_assigned_model_items_creation(self):
+        response = self.client.post(
+            reverse("foreign-keys-list"),
+            {
+                "title": "ForeignManyRelation",
+                "foreign_key_test_models": 1
+            },
+            **{
+                "HTTP_MODEL_CLASS": "ForeignManyRelation",
+                "HTTP_SERIALIZER_CLASS": "GenericSerializer"
+            }
+        )
+        self.assertEqual(response.status_code, 201)
+        self.assertJSONEqual(
+            response.content,
+            {
+                "id": 3,
+                "title": "ForeignManyRelation",
+                "foreign_key_test_models": [1]
+            }
+        )
+
+    def test_runtime_assigned_model_items_creation_fail(self):
+        response = self.client.post(
+            reverse("foreign-keys-list"),
+            {
+            },
+            **{
+                "HTTP_MODEL_CLASS": "ForeignKeyTestModel",
+                "HTTP_SERIALIZER_CLASS": "GenericSerializer"
+            }
+        )
+        self.assertEqual(response.status_code, 400)
+
+    def test_runtime_assigned_model_items_update(self):
+        response = self.client.put(
+            reverse("foreign-keys-detail", args=[1]),
+            {
+                "title": "ForeignManyRelation Renamed",
+                "foreign_key_test_models": [2]
+            },
+            **{
+                "HTTP_MODEL_CLASS": "ForeignManyRelation",
+                "HTTP_SERIALIZER_CLASS": "GenericSerializer"
+            }
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(
+            response.content,
+            {
+                "id": 1,
+                "title": "ForeignManyRelation Renamed",
+                "foreign_key_test_models": [2]
+            }
         )

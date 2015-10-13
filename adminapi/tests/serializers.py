@@ -7,17 +7,24 @@ class ManyRelationSerializer(serializers.ModelSerializer):
     class Meta:
         model = tests.ForeignManyRelation
         fields = (
-            "title",
+            "id",
+            "title"
         )
 
 
 class ForeignModelSerializer(serializers.ModelSerializer):
-    many_relation = ManyRelationSerializer(many=True, read_only=True)
+    foreign_many_relation = ManyRelationSerializer(many=True, read_only=True)
+
     class Meta:
         model = None
         fields = (
             "id",
-            "many_relation",
+            "foreign_many_relation",
             "title",
             "foreign_single_relation"
         )
+
+
+class GenericSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = None
