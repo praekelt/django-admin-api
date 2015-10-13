@@ -13,12 +13,6 @@ from rest_framework.authtoken.models import Token
 class Manufacturer(models.Model):
     title = models.CharField(max_length=100)
 
-    @property
-    def single_relations(self):
-        return self.car_set.all()
-
-    def __unicode__(self):
-        return self.title
 models.register_models("tests", Manufacturer)
 
 
@@ -27,12 +21,6 @@ class Car(models.Model):
     # Many to one relations
     manufacturer = models.ForeignKey(Manufacturer)
 
-    @property
-    def get_engine_sizes(self):
-        return self.enginesizes_set.all()
-
-    def __unicode__(self):
-        return self.title
 models.register_models("tests", Car)
 
 
