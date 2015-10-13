@@ -432,12 +432,12 @@ class ForeignKeyModelsTest(TestCase):
         cls.manufacturer.save()
 
         cls.car_1 = Car()
-        cls.car_1.title = "TestModel 1"
+        cls.car_1.title = "CarModel_1"
         cls.car_1.manufacturer = \
             cls.manufacturer
         cls.car_1.save()
         cls.car_2 = Car()
-        cls.car_2.title = "TestModel 2"
+        cls.car_2.title = "CarModel_2"
         cls.car_2.manufacturer = \
             cls.manufacturer
         cls.car_2.save()
@@ -475,7 +475,7 @@ class ForeignKeyModelsTest(TestCase):
             "BMW"
         )
 
-        self.assertEqual(self.car_1.title, "TestModel 1")
+        self.assertEqual(self.car_1.title, "CarModel_1")
         self.assertEqual(
             self.car_1.manufacturer,
             self.manufacturer
@@ -493,7 +493,7 @@ class ForeignKeyModelsTest(TestCase):
             ),
             [u'EngineSize 1', u'EngineSize 2']
         )
-        self.assertEqual(self.car_2.title, "TestModel 2")
+        self.assertEqual(self.car_2.title, "CarModel_2")
         self.assertEqual(
             self.car_2.manufacturer,
             self.manufacturer
@@ -540,7 +540,7 @@ class ForeignKeyModelsTest(TestCase):
                                 "title": "EngineSize 2"
                             }
                         ],
-                    "title": "TestModel 1",
+                    "title": "CarModel_1",
                     "manufacturer": 1
                 },
                 {
@@ -552,7 +552,7 @@ class ForeignKeyModelsTest(TestCase):
                                 "title": "EngineSize 1"
                             }
                         ],
-                    "title": "TestModel 2",
+                    "title": "CarModel_2",
                     "manufacturer": 1
                 }
             ]
@@ -562,7 +562,7 @@ class ForeignKeyModelsTest(TestCase):
         response = self.client.post(
             reverse("foreign-keys-list"),
             {
-                "title": "post_Model",
+                "title": "POST_operation_car",
                 "manufacturer": 1
             },
             **{
@@ -577,7 +577,7 @@ class ForeignKeyModelsTest(TestCase):
                 "manufacturer": 1,
                 "engine_size": [],
                 "id": 3,
-                "title": "post_Model"
+                "title": "POST_operation_car"
             },
         )
 
@@ -605,19 +605,19 @@ class ForeignKeyModelsTest(TestCase):
                             "title": "EngineSize 2"
                         }
                     ],
-                "title": "TestModel 1",
+                "title": "CarModel_1",
                 "manufacturer": 1
             }
         )
 
     def test_foreign_key_model_api_update_success(self):
         self.manufacturer = Manufacturer()
-        self.manufacturer.title = "ForeignRelation 2"
+        self.manufacturer.title = "Mercedes"
         self.manufacturer.save()
         response = self.client.put(
             reverse("foreign-keys-detail", args=[1]),
             {
-                "title": "Model 1 updated",
+                "title": "Jeep",
                 "manufacturer": 2
             },
             **{
@@ -641,7 +641,7 @@ class ForeignKeyModelsTest(TestCase):
                             "title": "EngineSize 2"
                         }
                     ],
-                "title": "Model 1 updated",
+                "title": "Jeep",
                 "manufacturer": 2
             }
         )
@@ -675,7 +675,7 @@ class ForeignKeyModelsTest(TestCase):
                                 "title": "EngineSize 1"
                             }
                         ],
-                    "title": "TestModel 2",
+                    "title": "CarModel_2",
                     "manufacturer": 1
                 }
             ]
@@ -695,12 +695,12 @@ class ForeignKeyModelsTest(TestCase):
             [
                 {
                     "id": 1,
-                    "title": "TestModel 1",
+                    "title": "CarModel_1",
                     "manufacturer": 1
                 },
                 {
                     "id": 2,
-                    "title": "TestModel 2",
+                    "title": "CarModel_2",
                     "manufacturer": 1
                 }
             ]
