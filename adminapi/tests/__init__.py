@@ -15,7 +15,7 @@ class Manufacturer(models.Model):
 
     @property
     def single_relations(self):
-        return self.foreignkeytestmodel_set.all()
+        return self.car_set.all()
 
     def __unicode__(self):
         return self.title
@@ -25,11 +25,11 @@ models.register_models("tests", Manufacturer)
 class Car(models.Model):
     title = models.CharField(max_length=100)
     # Many to one relations
-    foreign_single_relation = models.ForeignKey(Manufacturer)
+    manufacturer = models.ForeignKey(Manufacturer)
 
     @property
-    def many_relations(self):
-        return self.foreignmanyrelation_set.all()
+    def get_engine_sizes(self):
+        return self.enginesizes_set.all()
 
     def __unicode__(self):
         return self.title
@@ -39,9 +39,9 @@ models.register_models("tests", Car)
 class EngineSize(models.Model):
     title = models.CharField(max_length=100)
     # Many to many relations
-    foreign_key_test_models = models.ManyToManyField(
+    car = models.ManyToManyField(
         Car,
-        related_name="foreign_many_relation"
+        related_name="engine_size"
     )
 
     def __unicode__(self):
@@ -441,90 +441,90 @@ class ForeignKeyModelsTest(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.foreign_single_relation = Manufacturer()
-        cls.foreign_single_relation.title = "ForeignRelation 1"
-        cls.foreign_single_relation.save()
+        cls.manufacturer = Manufacturer()
+        cls.manufacturer.title = "BMW"
+        cls.manufacturer.save()
 
-        cls.foreign_key_test_model_1 = Car()
-        cls.foreign_key_test_model_1.title = "TestModel 1"
-        cls.foreign_key_test_model_1.foreign_single_relation = \
-            cls.foreign_single_relation
-        cls.foreign_key_test_model_1.save()
-        cls.foreign_key_test_model_2 = Car()
-        cls.foreign_key_test_model_2.title = "TestModel 2"
-        cls.foreign_key_test_model_2.foreign_single_relation = \
-            cls.foreign_single_relation
-        cls.foreign_key_test_model_2.save()
+        cls.car_1 = Car()
+        cls.car_1.title = "TestModel 1"
+        cls.car_1.manufacturer = \
+            cls.manufacturer
+        cls.car_1.save()
+        cls.car_2 = Car()
+        cls.car_2.title = "TestModel 2"
+        cls.car_2.manufacturer = \
+            cls.manufacturer
+        cls.car_2.save()
 
-        cls.foreign_many_relation_1 = EngineSize()
-        cls.foreign_many_relation_1.title = "EngineSize 1"
-        cls.foreign_many_relation_1.save()
-        cls.foreign_many_relation_1.foreign_key_test_models.add(
-            cls.foreign_key_test_model_1,
-            cls.foreign_key_test_model_2
+        cls.engine_size_1 = EngineSize()
+        cls.engine_size_1.title = "EngineSize 1"
+        cls.engine_size_1.save()
+        cls.engine_size_1.car.add(
+            cls.car_1,
+            cls.car_2
         )
-        cls.foreign_many_relation_1.save()
-        cls.foreign_many_relation_2 = EngineSize()
-        cls.foreign_many_relation_2.title = "EngineSize 2"
-        cls.foreign_many_relation_2.save()
-        cls.foreign_many_relation_2.foreign_key_test_models.add(
-            cls.foreign_key_test_model_1,
+        cls.engine_size_1.save()
+        cls.engine_size_2 = EngineSize()
+        cls.engine_size_2.title = "EngineSize 2"
+        cls.engine_size_2.save()
+        cls.engine_size_2.car.add(
+            cls.car_1,
         )
-        cls.foreign_many_relation_2.save()
+        cls.engine_size_2.save()
 
     @classmethod
     def tearDownClass(cls):
         super(ForeignKeyModelsTest, cls).tearDownClass()
 
     def test_model_instantiation(self):
-        self.assertIsNotNone(self.foreign_single_relation)
-        self.assertIsNotNone(self.foreign_key_test_model_1)
-        self.assertIsNotNone(self.foreign_key_test_model_2)
-        self.assertIsNotNone(self.foreign_many_relation_1)
-        self.assertIsNotNone(self.foreign_many_relation_2)
+        self.assertIsNotNone(self.manufacturer)
+        self.assertIsNotNone(self.car_1)
+        self.assertIsNotNone(self.car_2)
+        self.assertIsNotNone(self.engine_size_1)
+        self.assertIsNotNone(self.engine_size_2)
 
     def test_model_fields_success(self):
         self.assertEqual(
-            self.foreign_single_relation.title,
-            "ForeignRelation 1"
+            self.manufacturer.title,
+            "BMW"
         )
 
-        self.assertEqual(self.foreign_key_test_model_1.title, "TestModel 1")
+        self.assertEqual(self.car_1.title, "TestModel 1")
         self.assertEqual(
-            self.foreign_key_test_model_1.foreign_single_relation,
-            self.foreign_single_relation
+            self.car_1.manufacturer,
+            self.manufacturer
         )
         self.assertEqual(
-            self.foreign_key_test_model_1.foreign_single_relation.title,
-            "ForeignRelation 1"
+            self.car_1.manufacturer.title,
+            "BMW"
         )
         self.assertEqual(
             list(
-                self.foreign_key_test_model_1.foreign_many_relation.values_list(
+                self.car_1.engine_size.values_list(
                     'title',
                     flat=True
                 )
             ),
             [u'EngineSize 1', u'EngineSize 2']
         )
-        self.assertEqual(self.foreign_key_test_model_2.title, "TestModel 2")
+        self.assertEqual(self.car_2.title, "TestModel 2")
         self.assertEqual(
-            self.foreign_key_test_model_2.foreign_single_relation,
-            self.foreign_single_relation
+            self.car_2.manufacturer,
+            self.manufacturer
         )
         self.assertEqual(
-            self.foreign_key_test_model_2.foreign_single_relation.title,
-            "ForeignRelation 1"
+            self.car_2.manufacturer.title,
+            "BMW"
         )
 
     def test_model_fields_fail(self):
-        self.assertNotEqual(self.foreign_single_relation.title, "Not correct")
+        self.assertNotEqual(self.manufacturer.title, "Not correct")
         self.assertNotEqual(
-            self.foreign_key_test_model_1.title,
+            self.car_1.title,
             "Not correct 1"
         )
         self.assertNotEqual(
-            self.foreign_key_test_model_2.title,
+            self.car_2.title,
             "Not correct 2"
         )
 
@@ -543,7 +543,7 @@ class ForeignKeyModelsTest(TestCase):
             [
                 {
                     "id": 1,
-                    "foreign_many_relation":
+                    "engine_size":
                         [
                             {
                                 "id": 1,
@@ -555,11 +555,11 @@ class ForeignKeyModelsTest(TestCase):
                             }
                         ],
                     "title": "TestModel 1",
-                    "foreign_single_relation": 1
+                    "manufacturer": 1
                 },
                 {
                     "id": 2,
-                    "foreign_many_relation":
+                    "engine_size":
                         [
                             {
                                 "id": 1,
@@ -567,7 +567,7 @@ class ForeignKeyModelsTest(TestCase):
                             }
                         ],
                     "title": "TestModel 2",
-                    "foreign_single_relation": 1
+                    "manufacturer": 1
                 }
             ]
         )
@@ -577,7 +577,7 @@ class ForeignKeyModelsTest(TestCase):
             reverse("foreign-keys-list"),
             {
                 "title": "post_Model",
-                "foreign_single_relation": 1
+                "manufacturer": 1
             },
             **{
                 "HTTP_MODEL_CLASS": "Car",
@@ -588,8 +588,8 @@ class ForeignKeyModelsTest(TestCase):
         self.assertJSONEqual(
             response.content,
             {
-                "foreign_single_relation": 1,
-                "foreign_many_relation": [],
+                "manufacturer": 1,
+                "engine_size": [],
                 "id": 3,
                 "title": "post_Model"
             },
@@ -608,7 +608,7 @@ class ForeignKeyModelsTest(TestCase):
             response.content,
             {
                 "id": 1,
-                "foreign_many_relation":
+                "engine_size":
                     [
                         {
                             "id": 1,
@@ -620,19 +620,19 @@ class ForeignKeyModelsTest(TestCase):
                         }
                     ],
                 "title": "TestModel 1",
-                "foreign_single_relation": 1
+                "manufacturer": 1
             }
         )
 
     def test_foreign_key_model_api_update_success(self):
-        self.foreign_single_relation = Manufacturer()
-        self.foreign_single_relation.title = "ForeignRelation 2"
-        self.foreign_single_relation.save()
+        self.manufacturer = Manufacturer()
+        self.manufacturer.title = "ForeignRelation 2"
+        self.manufacturer.save()
         response = self.client.put(
             reverse("foreign-keys-detail", args=[1]),
             {
                 "title": "Model 1 updated",
-                "foreign_single_relation": 2
+                "manufacturer": 2
             },
             **{
                 "HTTP_MODEL_CLASS": "Car",
@@ -644,7 +644,7 @@ class ForeignKeyModelsTest(TestCase):
             response.content,
             {
                 "id": 1,
-                "foreign_many_relation":
+                "engine_size":
                     [
                         {
                             "id": 1,
@@ -656,7 +656,7 @@ class ForeignKeyModelsTest(TestCase):
                         }
                     ],
                 "title": "Model 1 updated",
-                "foreign_single_relation": 2
+                "manufacturer": 2
             }
         )
 
@@ -682,7 +682,7 @@ class ForeignKeyModelsTest(TestCase):
             [
                 {
                     "id": 2,
-                    "foreign_many_relation":
+                    "engine_size":
                         [
                             {
                                 "id": 1,
@@ -690,7 +690,7 @@ class ForeignKeyModelsTest(TestCase):
                             }
                         ],
                     "title": "TestModel 2",
-                    "foreign_single_relation": 1
+                    "manufacturer": 1
                 }
             ]
         )
@@ -710,12 +710,12 @@ class ForeignKeyModelsTest(TestCase):
                 {
                     "id": 1,
                     "title": "TestModel 1",
-                    "foreign_single_relation": 1
+                    "manufacturer": 1
                 },
                 {
                     "id": 2,
                     "title": "TestModel 2",
-                    "foreign_single_relation": 1
+                    "manufacturer": 1
                 }
             ]
         )
@@ -725,7 +725,7 @@ class ForeignKeyModelsTest(TestCase):
             reverse("foreign-keys-list"),
             {
                 "title": "EngineSize",
-                "foreign_key_test_models": 1
+                "car": 1
             },
             **{
                 "HTTP_MODEL_CLASS": "EngineSize",
@@ -738,7 +738,7 @@ class ForeignKeyModelsTest(TestCase):
             {
                 "id": 3,
                 "title": "EngineSize",
-                "foreign_key_test_models": [1]
+                "car": [1]
             }
         )
 
@@ -759,7 +759,7 @@ class ForeignKeyModelsTest(TestCase):
             reverse("foreign-keys-detail", args=[1]),
             {
                 "title": "EngineSize Renamed",
-                "foreign_key_test_models": [2]
+                "car": [2]
             },
             **{
                 "HTTP_MODEL_CLASS": "EngineSize",
@@ -772,6 +772,6 @@ class ForeignKeyModelsTest(TestCase):
             {
                 "id": 1,
                 "title": "EngineSize Renamed",
-                "foreign_key_test_models": [2]
+                "car": [2]
             }
         )

@@ -13,15 +13,15 @@ class EngineSizeSerializer(serializers.ModelSerializer):
 
 
 class CarSerializer(serializers.ModelSerializer):
-    foreign_many_relation = EngineSizeSerializer(many=True, read_only=True)
+    engine_size = EngineSizeSerializer(many=True, read_only=True)
 
     class Meta:
         model = None
         fields = (
             "id",
-            "foreign_many_relation",
+            "engine_size",
             "title",
-            "foreign_single_relation"
+            "manufacturer"
         )
 
 
