@@ -10,7 +10,7 @@ from rest_framework.test import APIRequestFactory, APIClient
 from rest_framework.authtoken.models import Token
 
 
-class ForeignSingleRelation(models.Model):
+class Manufacturer(models.Model):
     title = models.CharField(max_length=100)
 
     @property
@@ -19,13 +19,13 @@ class ForeignSingleRelation(models.Model):
 
     def __unicode__(self):
         return self.title
-models.register_models("tests", ForeignSingleRelation)
+models.register_models("tests", Manufacturer)
 
 
-class ForeignKeyTestModel(models.Model):
+class Car(models.Model):
     title = models.CharField(max_length=100)
     # Many to one relations
-    foreign_single_relation = models.ForeignKey(ForeignSingleRelation)
+    foreign_single_relation = models.ForeignKey(Manufacturer)
 
     @property
     def many_relations(self):
@@ -33,20 +33,20 @@ class ForeignKeyTestModel(models.Model):
 
     def __unicode__(self):
         return self.title
-models.register_models("tests", ForeignKeyTestModel)
+models.register_models("tests", Car)
 
 
-class ForeignManyRelation(models.Model):
+class EngineSize(models.Model):
     title = models.CharField(max_length=100)
     # Many to many relations
     foreign_key_test_models = models.ManyToManyField(
-        ForeignKeyTestModel,
+        Car,
         related_name="foreign_many_relation"
     )
 
     def __unicode__(self):
         return self.title
-models.register_models("tests", ForeignManyRelation)
+models.register_models("tests", EngineSize)
 
 
 class LoginTest(TestCase):
@@ -441,31 +441,31 @@ class ForeignKeyModelsTest(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.foreign_single_relation = ForeignSingleRelation()
+        cls.foreign_single_relation = Manufacturer()
         cls.foreign_single_relation.title = "ForeignRelation 1"
         cls.foreign_single_relation.save()
 
-        cls.foreign_key_test_model_1 = ForeignKeyTestModel()
+        cls.foreign_key_test_model_1 = Car()
         cls.foreign_key_test_model_1.title = "TestModel 1"
         cls.foreign_key_test_model_1.foreign_single_relation = \
             cls.foreign_single_relation
         cls.foreign_key_test_model_1.save()
-        cls.foreign_key_test_model_2 = ForeignKeyTestModel()
+        cls.foreign_key_test_model_2 = Car()
         cls.foreign_key_test_model_2.title = "TestModel 2"
         cls.foreign_key_test_model_2.foreign_single_relation = \
             cls.foreign_single_relation
         cls.foreign_key_test_model_2.save()
 
-        cls.foreign_many_relation_1 = ForeignManyRelation()
-        cls.foreign_many_relation_1.title = "ForeignManyRelation 1"
+        cls.foreign_many_relation_1 = EngineSize()
+        cls.foreign_many_relation_1.title = "EngineSize 1"
         cls.foreign_many_relation_1.save()
         cls.foreign_many_relation_1.foreign_key_test_models.add(
             cls.foreign_key_test_model_1,
             cls.foreign_key_test_model_2
         )
         cls.foreign_many_relation_1.save()
-        cls.foreign_many_relation_2 = ForeignManyRelation()
-        cls.foreign_many_relation_2.title = "ForeignManyRelation 2"
+        cls.foreign_many_relation_2 = EngineSize()
+        cls.foreign_many_relation_2.title = "EngineSize 2"
         cls.foreign_many_relation_2.save()
         cls.foreign_many_relation_2.foreign_key_test_models.add(
             cls.foreign_key_test_model_1,
@@ -505,7 +505,7 @@ class ForeignKeyModelsTest(TestCase):
                     flat=True
                 )
             ),
-            [u'ForeignManyRelation 1', u'ForeignManyRelation 2']
+            [u'EngineSize 1', u'EngineSize 2']
         )
         self.assertEqual(self.foreign_key_test_model_2.title, "TestModel 2")
         self.assertEqual(
@@ -533,8 +533,8 @@ class ForeignKeyModelsTest(TestCase):
         response = self.client.get(
             reverse("foreign-keys-list"),
             **{
-                "HTTP_MODEL_CLASS": "ForeignKeyTestModel",
-                "HTTP_SERIALIZER_CLASS": "ForeignModelSerializer"
+                "HTTP_MODEL_CLASS": "Car",
+                "HTTP_SERIALIZER_CLASS": "CarSerializer"
             }
         )
         self.assertEqual(response.status_code, 200)
@@ -547,11 +547,11 @@ class ForeignKeyModelsTest(TestCase):
                         [
                             {
                                 "id": 1,
-                                "title": "ForeignManyRelation 1"
+                                "title": "EngineSize 1"
                             },
                             {
                                 "id": 2,
-                                "title": "ForeignManyRelation 2"
+                                "title": "EngineSize 2"
                             }
                         ],
                     "title": "TestModel 1",
@@ -563,7 +563,7 @@ class ForeignKeyModelsTest(TestCase):
                         [
                             {
                                 "id": 1,
-                                "title": "ForeignManyRelation 1"
+                                "title": "EngineSize 1"
                             }
                         ],
                     "title": "TestModel 2",
@@ -580,8 +580,8 @@ class ForeignKeyModelsTest(TestCase):
                 "foreign_single_relation": 1
             },
             **{
-                "HTTP_MODEL_CLASS": "ForeignKeyTestModel",
-                "HTTP_SERIALIZER_CLASS": "ForeignModelSerializer"
+                "HTTP_MODEL_CLASS": "Car",
+                "HTTP_SERIALIZER_CLASS": "CarSerializer"
             }
         )
         self.assertEqual(response.status_code, 201)
@@ -599,8 +599,8 @@ class ForeignKeyModelsTest(TestCase):
         response = self.client.get(
             reverse("foreign-keys-detail", args=[1]),
             **{
-                "HTTP_MODEL_CLASS": "ForeignKeyTestModel",
-                "HTTP_SERIALIZER_CLASS": "ForeignModelSerializer"
+                "HTTP_MODEL_CLASS": "Car",
+                "HTTP_SERIALIZER_CLASS": "CarSerializer"
             }
         )
         self.assertEqual(response.status_code, 200)
@@ -612,11 +612,11 @@ class ForeignKeyModelsTest(TestCase):
                     [
                         {
                             "id": 1,
-                            "title": "ForeignManyRelation 1"
+                            "title": "EngineSize 1"
                         },
                         {
                             "id": 2,
-                            "title": "ForeignManyRelation 2"
+                            "title": "EngineSize 2"
                         }
                     ],
                 "title": "TestModel 1",
@@ -625,7 +625,7 @@ class ForeignKeyModelsTest(TestCase):
         )
 
     def test_foreign_key_model_api_update_success(self):
-        self.foreign_single_relation = ForeignSingleRelation()
+        self.foreign_single_relation = Manufacturer()
         self.foreign_single_relation.title = "ForeignRelation 2"
         self.foreign_single_relation.save()
         response = self.client.put(
@@ -635,8 +635,8 @@ class ForeignKeyModelsTest(TestCase):
                 "foreign_single_relation": 2
             },
             **{
-                "HTTP_MODEL_CLASS": "ForeignKeyTestModel",
-                "HTTP_SERIALIZER_CLASS": "ForeignModelSerializer"
+                "HTTP_MODEL_CLASS": "Car",
+                "HTTP_SERIALIZER_CLASS": "CarSerializer"
             }
         )
         self.assertEqual(response.status_code, 200)
@@ -648,11 +648,11 @@ class ForeignKeyModelsTest(TestCase):
                     [
                         {
                             "id": 1,
-                            "title": "ForeignManyRelation 1"
+                            "title": "EngineSize 1"
                         },
                         {
                             "id": 2,
-                            "title": "ForeignManyRelation 2"
+                            "title": "EngineSize 2"
                         }
                     ],
                 "title": "Model 1 updated",
@@ -664,16 +664,16 @@ class ForeignKeyModelsTest(TestCase):
         response = self.client.delete(
             reverse("foreign-keys-detail", args=[1]),
             **{
-                "HTTP_MODEL_CLASS": "ForeignKeyTestModel",
-                "HTTP_SERIALIZER_CLASS": "ForeignModelSerializer"
+                "HTTP_MODEL_CLASS": "Car",
+                "HTTP_SERIALIZER_CLASS": "CarSerializer"
             }
         )
         self.assertEqual(response.status_code, 204)
         response = self.client.get(
             reverse("foreign-keys-list"),
             **{
-                "HTTP_MODEL_CLASS": "ForeignKeyTestModel",
-                "HTTP_SERIALIZER_CLASS": "ForeignModelSerializer"
+                "HTTP_MODEL_CLASS": "Car",
+                "HTTP_SERIALIZER_CLASS": "CarSerializer"
             }
         )
         self.assertEqual(response.status_code, 200)
@@ -686,7 +686,7 @@ class ForeignKeyModelsTest(TestCase):
                         [
                             {
                                 "id": 1,
-                                "title": "ForeignManyRelation 1"
+                                "title": "EngineSize 1"
                             }
                         ],
                     "title": "TestModel 2",
@@ -699,7 +699,7 @@ class ForeignKeyModelsTest(TestCase):
         response = self.client.get(
             reverse("foreign-keys-list"),
             **{
-                "HTTP_MODEL_CLASS": "ForeignKeyTestModel",
+                "HTTP_MODEL_CLASS": "Car",
                 "HTTP_SERIALIZER_CLASS": "GenericSerializer"
             }
         )
@@ -724,11 +724,11 @@ class ForeignKeyModelsTest(TestCase):
         response = self.client.post(
             reverse("foreign-keys-list"),
             {
-                "title": "ForeignManyRelation",
+                "title": "EngineSize",
                 "foreign_key_test_models": 1
             },
             **{
-                "HTTP_MODEL_CLASS": "ForeignManyRelation",
+                "HTTP_MODEL_CLASS": "EngineSize",
                 "HTTP_SERIALIZER_CLASS": "GenericSerializer"
             }
         )
@@ -737,7 +737,7 @@ class ForeignKeyModelsTest(TestCase):
             response.content,
             {
                 "id": 3,
-                "title": "ForeignManyRelation",
+                "title": "EngineSize",
                 "foreign_key_test_models": [1]
             }
         )
@@ -748,7 +748,7 @@ class ForeignKeyModelsTest(TestCase):
             {
             },
             **{
-                "HTTP_MODEL_CLASS": "ForeignKeyTestModel",
+                "HTTP_MODEL_CLASS": "Car",
                 "HTTP_SERIALIZER_CLASS": "GenericSerializer"
             }
         )
@@ -758,11 +758,11 @@ class ForeignKeyModelsTest(TestCase):
         response = self.client.put(
             reverse("foreign-keys-detail", args=[1]),
             {
-                "title": "ForeignManyRelation Renamed",
+                "title": "EngineSize Renamed",
                 "foreign_key_test_models": [2]
             },
             **{
-                "HTTP_MODEL_CLASS": "ForeignManyRelation",
+                "HTTP_MODEL_CLASS": "EngineSize",
                 "HTTP_SERIALIZER_CLASS": "GenericSerializer"
             }
         )
@@ -771,7 +771,7 @@ class ForeignKeyModelsTest(TestCase):
             response.content,
             {
                 "id": 1,
-                "title": "ForeignManyRelation Renamed",
+                "title": "EngineSize Renamed",
                 "foreign_key_test_models": [2]
             }
         )

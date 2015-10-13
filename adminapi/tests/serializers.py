@@ -3,17 +3,17 @@ from rest_framework import serializers
 from adminapi import tests
 
 
-class ManyRelationSerializer(serializers.ModelSerializer):
+class EngineSizeSerializer(serializers.ModelSerializer):
     class Meta:
-        model = tests.ForeignManyRelation
+        model = tests.EngineSize
         fields = (
             "id",
             "title"
         )
 
 
-class ForeignModelSerializer(serializers.ModelSerializer):
-    foreign_many_relation = ManyRelationSerializer(many=True, read_only=True)
+class CarSerializer(serializers.ModelSerializer):
+    foreign_many_relation = EngineSizeSerializer(many=True, read_only=True)
 
     class Meta:
         model = None

@@ -1,12 +1,12 @@
 from adminapi import tests
 
 model_registry = {
-    "ForeignKeyTestModel": tests.ForeignKeyTestModel,
-    "ForeignSingleRelation": tests.ForeignSingleRelation,
-    "ForeignManyRelation": tests.ForeignManyRelation,
+    "Car": tests.Car,
+    "Manufacturer": tests.Manufacturer,
+    "EngineSize": tests.EngineSize,
 }
 
 serializer_registry = {
     "GenericSerializer": tests.serializers.GenericSerializer,
-    "ForeignModelSerializer": tests.serializers.ForeignModelSerializer,
+    "CarSerializer": tests.serializers.CarSerializer,
 }
