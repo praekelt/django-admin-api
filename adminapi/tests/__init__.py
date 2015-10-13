@@ -32,8 +32,6 @@ class EngineSize(models.Model):
         related_name="engine_size"
     )
 
-    def __unicode__(self):
-        return self.title
 models.register_models("tests", EngineSize)
 
 
