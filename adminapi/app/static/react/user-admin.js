@@ -307,6 +307,6 @@ var Form = React.createClass({displayName: 'Form',
 });
 
 ReactDOM.render(
-    React.createElement(FormContainer,{url: '/users/'}),
+    React.createElement(FormContainer,{url: '/api/v1/users/'}),
     document.getElementById('users')
 );

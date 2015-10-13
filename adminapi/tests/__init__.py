@@ -1,15 +1,54 @@
 import base64, pdb, logging
 
 from django.test import TestCase
+from django.db import models
 from django.contrib.auth.models import User
 from django.test import RequestFactory
-from django.db import models
 from django.core.urlresolvers import reverse
 
 from rest_framework.test import APIRequestFactory, APIClient
 from rest_framework.authtoken.models import Token
 
-from adminapi.tests import models
+from adminapi.api.views import LoginView
+
+
+class TestModel(models.Model):
+    test_editable_field = models.CharField(max_length=32)
+    test_non_editable_field = models.CharField(max_length=32, editable=False)
+models.register_models('tests', TestModel)
+
+
+class ForeignSingleRelation(models.Model):
+    title = models.CharField(max_length=100)
+
+    @property
+    def single_relations(self):
+        return self.foreignkeytestmodel_set.all()
+
+    def __unicode__(self):
+        return self.title
+
+
+class ForeignKeyTestModel(models.Model):
+    title = models.CharField(max_length=100)
+    # Many to one relations
+    foreign_single_relation = models.ForeignKey(ForeignSingleRelation)
+
+    @property
+    def many_relations(self):
+        return self.foreignmanyrelation_set.all()
+
+    def __unicode__(self):
+        return self.title
+
+
+class ForeignManyRelation(models.Model):
+    title = models.CharField(max_length=100)
+    # Many to many relations
+    foreign_key_test_models = models.ManyToManyField(ForeignKeyTestModel)
+
+    def __unicode__(self):
+        return self.title
 
 
 class TrivialTest(TestCase):
@@ -58,7 +97,10 @@ class LoginTest(TestCase):
         cls.user.save()
         cls.token = Token.objects.create(user=cls.user)
         cls.token.save()
+<<<<<<< HEAD
         cls.test_model = models.TestModel()
+=======
+>>>>>>> develop
         super(LoginTest, cls).setUpClass()
 
     @classmethod
@@ -70,7 +112,11 @@ class LoginTest(TestCase):
             HTTP_AUTHORIZATION="Basic " + base64.b64encode("tester:test1pass")
         )
         response = self.client.post(
+<<<<<<< HEAD
             reverse("login")
+=======
+            reverse('api:login')
+>>>>>>> develop
         )
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(
@@ -87,7 +133,11 @@ class LoginTest(TestCase):
             HTTP_AUTHORIZATION="Basic " + base64.b64encode("wrong:creds")
         )
         response = self.client.post(
+<<<<<<< HEAD
             reverse("login"),
+=======
+           reverse('api:login')
+>>>>>>> develop
         )
         self.assertEqual(response.status_code, 401)
         self.assertJSONEqual(
@@ -97,6 +147,7 @@ class LoginTest(TestCase):
             }
         )
 
+<<<<<<< HEAD
     def test_token_auth_success(self):
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
         response = self.client.get(
@@ -190,6 +241,8 @@ class LoginTest(TestCase):
         )
         self.assertEqual(response.status_code, 204)
 
+=======
+>>>>>>> develop
 
 class CRUDUsersTest(TestCase):
 
@@ -218,14 +271,22 @@ class CRUDUsersTest(TestCase):
     def test_access_success(self):
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
         response = self.client.get(
+<<<<<<< HEAD
             reverse("users-list")
+=======
+            reverse('api:users-list')
+>>>>>>> develop
         )
         self.assertEqual(response.status_code, 200)
 
     def test_access_denied(self):
         self.client.credentials(HTTP_AUTHORIZATION="Token " + "Wr0ngT0k3n")
         response = self.client.get(
+<<<<<<< HEAD
             reverse("users-list")
+=======
+            reverse('api:users-list')
+>>>>>>> develop
         )
         self.assertEqual(response.status_code, 401)
 
@@ -241,7 +302,11 @@ class CRUDUsersTest(TestCase):
         self.user.save()
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
         response = self.client.get(
+<<<<<<< HEAD
            reverse("users-list"),
+=======
+           reverse('api:users-list'),
+>>>>>>> develop
         )
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(
@@ -278,7 +343,11 @@ class CRUDUsersTest(TestCase):
         self.token.save()
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
         response = self.client.get(
+<<<<<<< HEAD
            reverse("users-list"),
+=======
+           reverse('api:users-list'),
+>>>>>>> develop
         )
         self.assertEqual(response.status_code, 403)
 
@@ -294,7 +363,11 @@ class CRUDUsersTest(TestCase):
         self.user.save()
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
         response = self.client.get(
+<<<<<<< HEAD
            reverse("users-detail", args=[2]),
+=======
+           reverse('api:users-detail', args=[2]),
+>>>>>>> develop
         )
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(
@@ -311,7 +384,11 @@ class CRUDUsersTest(TestCase):
     def test_user_data_creation_success(self):
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
         response = self.client.post(
+<<<<<<< HEAD
             reverse("users-list"),
+=======
+            reverse('api:users-list'),
+>>>>>>> develop
             {
                 "username": "APIUser",
                 "password": "APIpass",
@@ -346,7 +423,11 @@ class CRUDUsersTest(TestCase):
         self.token.save()
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
         response = self.client.post(
+<<<<<<< HEAD
             reverse("users-list"),
+=======
+            reverse('api:users-list'),
+>>>>>>> develop
             {
                 "username": "APIUser",
                 "password": "APIpass",
@@ -369,11 +450,19 @@ class CRUDUsersTest(TestCase):
         self.user.save()
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
         response = self.client.delete(
+<<<<<<< HEAD
             reverse("users-detail", args=[2])
         )
         self.assertEqual(response.status_code, 204)
         response = self.client.get(
             reverse("users-list"),
+=======
+            reverse('api:users-detail', args=[2])
+        )
+        self.assertEqual(response.status_code, 204)
+        response = self.client.get(
+            reverse('api:users-list'),
+>>>>>>> develop
         )
         self.assertJSONEqual(
             response.content,
@@ -400,7 +489,11 @@ class CRUDUsersTest(TestCase):
         self.user.save()
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
         response = self.client.put(
+<<<<<<< HEAD
             reverse("users-detail", args=[2]),
+=======
+            reverse('api:users-detail', args=[2]),
+>>>>>>> develop
             {
                 "username": "APIUser",
                 "password": "APIpass",
@@ -435,7 +528,11 @@ class CRUDUsersTest(TestCase):
         self.token.save()
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
         response = self.client.put(
+<<<<<<< HEAD
             reverse("users-detail", args=[2]),
+=======
+            reverse('api:users-detail', args=[2]),
+>>>>>>> develop
             {
                 "username": "APIUser",
                 "password": "APIpass",
@@ -449,7 +546,11 @@ class CRUDUsersTest(TestCase):
     def test_user_data_creation_field_error_responses(self):
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
         response = self.client.post(
+<<<<<<< HEAD
             reverse("users-list"),
+=======
+            reverse('api:users-list'),
+>>>>>>> develop
             {
             }
         )
@@ -462,7 +563,11 @@ class CRUDUsersTest(TestCase):
             }
         )
         response = self.client.post(
+<<<<<<< HEAD
             reverse("users-list"),
+=======
+            reverse('api:users-list'),
+>>>>>>> develop
             {
                 "username": "Super"
             }
@@ -476,7 +581,11 @@ class CRUDUsersTest(TestCase):
             }
         )
         response = self.client.post(
+<<<<<<< HEAD
             reverse("users-list"),
+=======
+            reverse('api:users-list'),
+>>>>>>> develop
             {
                 "username": "Super",
                 "password": "test"
@@ -493,7 +602,11 @@ class CRUDUsersTest(TestCase):
     def test_user_data_update_field_error_responses(self):
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
         response = self.client.put(
+<<<<<<< HEAD
             reverse("users-detail", args=[1]),
+=======
+            reverse('api:users-detail', args=[1]),
+>>>>>>> develop
             {
             }
         )
@@ -505,7 +618,11 @@ class CRUDUsersTest(TestCase):
             }
         )
         response = self.client.post(
+<<<<<<< HEAD
             reverse("users-list"),
+=======
+            reverse('api:users-list'),
+>>>>>>> develop
             {
                 "username": "Super"
             }

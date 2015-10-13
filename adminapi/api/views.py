@@ -7,11 +7,10 @@ from rest_framework.authentication import TokenAuthentication, BasicAuthenticati
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework import serializers
-from rest_framework import viewsets
+from rest_framework import viewsets, versioning
 
-from adminapi.serializers import UserSerializer, GenericSerializer
-from adminapi.tests.models import TestModel
-from adminapi import registry
+from adminapi.api.serializers import UserSerializer, GenericSerializer
+from adminapi.api import registry
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -60,19 +59,3 @@ class LoginView(APIView):
             "token": token.key,
             "username": request.user.username
          })
-
-
-class TestView(APIView):
-    authentication_classes = (TokenAuthentication,)
-    permission_classes = (IsAuthenticated,)
-
-    def get(self, request, format=None):
-        return Response({"detail": "Auth Token Valid"})
-
-
-class GenericViewSet(viewsets.ModelViewSet):
-    model = registry.model_registry['TestModel']
-    queryset = model.objects.all()
-    serializer = GenericSerializer
-    serializer.Meta.model = model
-    serializer_class = serializer

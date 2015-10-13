@@ -16,6 +16,8 @@ INSTALLED_APPS = (
     'rest_framework.authtoken',
     'adminapi',
     'adminapi.tests',
+    'adminapi.app',
+    'adminapi.api',
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (

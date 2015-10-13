@@ -8,7 +8,7 @@ $(function () {
     $.ajaxSetup({
         beforeSend: function(xhr, settings) {
             if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                xhr.setRequestHeader('X-CSRFToken', csrftoken);
             }
         }
     });
@@ -31,7 +31,7 @@ var LoginContainer = React.createClass({displayName: 'ReactLogin',
                 console.log('state set');
                 Cookies.set('token', data, {expires: 1}, {secure: true});
                 console.log('Cookie data set');
-                window.location = '/users/app/';
+                window.location = '/app/users/';
             }.bind(this),
             error: function(xhr, status, err) {
                 jsonError = JSON.parse(xhr.responseText);
@@ -71,7 +71,7 @@ var LoginForm = React.createClass({displayName: 'LoginForm',
 });
 
 React.render(
-    React.createElement(LoginContainer,{url: '/login/'}),
+    React.createElement(LoginContainer,{url: '/api/v1/login/'}),
     document.getElementById('login')
 );
 
