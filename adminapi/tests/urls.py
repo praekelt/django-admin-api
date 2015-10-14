@@ -6,13 +6,13 @@ from adminapi.tests import views
 
 router = DefaultRouter()
 router.register(
-    r'foreign_keys',
-    views.ForeignKeyViewSet,
-    base_name='foreign-keys'
+    r"generic/(?P<model_name>\w+)",
+    views.GenericViewSet,
+    base_name="generic"
 )
 
 urlpatterns = patterns(
     "",
-    url(r'^', include(router.urls)),
-    url(r"^adminapi/", include('adminapi.urls')),
+    url(r"^", include(router.urls)),
+    url(r"^adminapi/", include("adminapi.urls")),
 )
