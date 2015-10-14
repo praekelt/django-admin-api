@@ -10,10 +10,10 @@ from rest_framework import serializers, exceptions
 class UserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = User.objects.create(
-            username = validated_data['username'],
-            first_name = validated_data['first_name'],
-            last_name = validated_data['last_name'],
-            email = validated_data['email'],
+            username=validated_data['username'],
+            first_name=validated_data['first_name'],
+            last_name=validated_data['last_name'],
+            email=validated_data['email'],
         )
         user.set_password(validated_data['password'])
         user.save()
@@ -22,7 +22,9 @@ class UserSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         if validated_data.get('username', None) is None:
-            raise serializers.ValidationError({'username': {'This field is required.'}})
+            raise serializers.ValidationError(
+                {'username': ['This field is required.']}
+            )
 
         instance.username = validated_data['username']
         instance.first_name = validated_data['first_name']

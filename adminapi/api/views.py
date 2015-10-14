@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from rest_framework import viewsets, generics
 from rest_framework.views import APIView
 from rest_framework.authtoken.models import Token
-from rest_framework.authentication import TokenAuthentication, BasicAuthentication
+from rest_framework import authentication
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework import serializers
@@ -14,7 +14,7 @@ from adminapi.api import registry
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    authentication_classes = (TokenAuthentication,)
+    authentication_classes = (authentication.TokenAuthentication,)
     permission_classes = (IsAdminUser,)
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -40,7 +40,11 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response(user)
 
     def update(self, request, pk=None):
-        serializer = UserSerializer(self.get_object(), data=request.data, partial=True)
+        serializer = UserSerializer(
+            self.get_object(),
+            data=request.data,
+            partial=True
+        )
         serializer.is_valid(raise_exception=True)
         serializer.save()
         user = serializer.data
@@ -49,13 +53,13 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 class LoginView(APIView):
-    authentication_classes = (BasicAuthentication,)
+    authentication_classes = (authentication.BasicAuthentication,)
 
     def post(self, request, format=None):
         user = request.user
         token, created = Token.objects.get_or_create(user=user)
         return Response({
-            "detail": "Credentials Validated",
+            "detail": "Credentials validated",
             "token": token.key,
             "username": request.user.username
          })
