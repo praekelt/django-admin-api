@@ -23,7 +23,7 @@ class UserSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         if validated_data.get('username', None) is None:
             raise serializers.ValidationError(
-                {'username': {'This field is required.'}}
+                {'username': ['This field is required.']}
             )
 
         instance.username = validated_data['username']

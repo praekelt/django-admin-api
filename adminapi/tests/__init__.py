@@ -69,7 +69,7 @@ class LoginTest(TestCase):
         self.assertJSONEqual(
             response.content,
             {
-                "detail": "Credentials Validated",
+                "detail": "Credentials validated",
                 "token": self.token.key,
                 "username": self.user.username
             }
