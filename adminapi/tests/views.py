@@ -15,16 +15,16 @@ from rest_framework.exceptions import APIException
 
 class ModelDoesNotExist(APIException):
     status_code = 400
-    default_detail = 'Model does not exist'
+    default_detail = "Model or App does not exist"
 
 
 class GenericViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         model_name = self.request.resolver_match.kwargs.get("model_name")
-
+        app_name = self.request.resolver_match.kwargs.get("app_name")
         try:
             queryset = models.ContentType.objects.get(
-                app_label="adminapi",
+                app_label=app_name,
                 model=model_name
             ).model_class().objects.all()
             return queryset
@@ -33,6 +33,7 @@ class GenericViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         model_name = self.request.resolver_match.kwargs.get("model_name")
+        app_name = self.request.resolver_match.kwargs.get("app_name")
         serializer = registry.serializer_registry.get(
             model_name,
             tests.serializers.GenericSerializer
@@ -41,7 +42,7 @@ class GenericViewSet(viewsets.ModelViewSet):
 
         try:
             model = models.ContentType.objects.get(
-                app_label="adminapi",
+                app_label=app_name,
                 model=model_name
             ).model_class()
             serializer.Meta.model = model
