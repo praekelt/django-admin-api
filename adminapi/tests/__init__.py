@@ -464,7 +464,7 @@ class ModelsTest(TestCase):
 
     def test_car_model_api_list_response_success(self):
         response = self.client.get(
-            reverse("generic-list", args=["adminapi", "car"]),
+            reverse("test-generic-list", args=["adminapi", "car"]),
         )
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(
@@ -503,7 +503,7 @@ class ModelsTest(TestCase):
 
     def test_car_model_api_create_success(self):
         response = self.client.post(
-            reverse("generic-list", args=["adminapi", "car"]),
+            reverse("test-generic-list", args=["adminapi", "car"]),
             {
                 "title": "POST_operation_car",
                 "manufacturer": 1
@@ -522,7 +522,7 @@ class ModelsTest(TestCase):
 
     def test_car_model_api_fetch_detail_success(self):
         response = self.client.get(
-            reverse("generic-detail", args=["adminapi", "car", 1]),
+            reverse("test-generic-detail", args=["adminapi", "car", 1]),
         )
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(
@@ -550,7 +550,7 @@ class ModelsTest(TestCase):
         self.manufacturer.title = "Mercedes"
         self.manufacturer.save()
         response = self.client.put(
-            reverse("generic-detail", args=["adminapi", "car", 1]),
+            reverse("test-generic-detail", args=["adminapi", "car", 1]),
             {
                 "title": "Jeep",
                 "manufacturer": 2
@@ -579,11 +579,11 @@ class ModelsTest(TestCase):
 
     def test_car_model_api_delete_success(self):
         response = self.client.delete(
-            reverse("generic-detail", args=["adminapi", "car", 1]),
+            reverse("test-generic-detail", args=["adminapi", "car", 1]),
         )
         self.assertEqual(response.status_code, 204)
         response = self.client.get(
-            reverse("generic-list", args=["adminapi", "car"]),
+            reverse("test-generic-list", args=["adminapi", "car"]),
         )
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(
@@ -606,7 +606,7 @@ class ModelsTest(TestCase):
 
     def test_generic_serializer_list_retrieve(self):
         response = self.client.get(
-            reverse("generic-list", args=["adminapi", "enginesize"]),
+            reverse("test-generic-list", args=["adminapi", "enginesize"]),
         )
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(
@@ -627,7 +627,7 @@ class ModelsTest(TestCase):
 
     def test_generic_serializer_item_create(self):
         response = self.client.post(
-            reverse("generic-list", args=["adminapi", "enginesize"]),
+            reverse("test-generic-list", args=["adminapi", "enginesize"]),
             {
                 "title": "EngineSize",
                 "car": 1
@@ -645,7 +645,7 @@ class ModelsTest(TestCase):
 
     def test_generic_serializer_items_creation_fail(self):
         response = self.client.post(
-            reverse("generic-list", args=["adminapi", "enginesize"]),
+            reverse("test-generic-list", args=["adminapi", "enginesize"]),
             {
             },
         )
@@ -653,7 +653,7 @@ class ModelsTest(TestCase):
 
     def test_generic_serializer_items_update(self):
         response = self.client.put(
-            reverse("generic-detail", args=["adminapi", "enginesize", 1]),
+            reverse("test-generic-detail", args=["adminapi", "enginesize", 1]),
             {
                 "title": "EngineSize Renamed",
                 "car": [2]
@@ -671,7 +671,7 @@ class ModelsTest(TestCase):
 
     def test_generic_serializer_items_incorrect_variables_update(self):
         response = self.client.put(
-            reverse("generic-detail", args=["adminapi", "enginesize", 1]),
+            reverse("test-generic-detail", args=["adminapi", "enginesize", 1]),
             {
                 "NoNtitle": "EngineSize Renamed",
                 "car": [2]
@@ -687,7 +687,7 @@ class ModelsTest(TestCase):
 
     def test_no_matching_model_name_from_url_error_list(self):
         response = self.client.get(
-            reverse("generic-list", args=["noneApp", "noneType"]),
+            reverse("test-generic-list", args=["noneApp", "noneType"]),
         )
         self.assertEqual(response.status_code, 400)
         self.assertJSONEqual(
@@ -699,7 +699,7 @@ class ModelsTest(TestCase):
 
     def test_no_matching_model_name_from_url_error_post(self):
         response = self.client.post(
-            reverse("generic-list", args=["noneApp", "noneType"]),
+            reverse("test-generic-list", args=["noneApp", "noneType"]),
         )
         self.assertEqual(response.status_code, 400)
         self.assertJSONEqual(
@@ -711,7 +711,7 @@ class ModelsTest(TestCase):
 
     def test_no_matching_model_name_from_url_error_put(self):
         response = self.client.put(
-            reverse("generic-detail", args=["noneApp", "noneType", 2]),
+            reverse("test-generic-detail", args=["noneApp", "noneType", 2]),
         )
         self.assertEqual(response.status_code, 400)
         self.assertJSONEqual(
@@ -723,7 +723,85 @@ class ModelsTest(TestCase):
 
     def test_no_matching_model_name_from_url_error_detail_get(self):
         response = self.client.get(
-            reverse("generic-detail", args=["noneApp", "noneType", 2]),
+            reverse("test-generic-detail", args=["noneApp", "noneType", 2]),
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertJSONEqual(
+            response.content,
+            {
+                "detail": "Model or App does not exist"
+            }
+        )
+
+    def test_API_generic_serializer_item_create(self):
+        response = self.client.post(
+            reverse("api:generic-list", args=["adminapi", "enginesize"]),
+            {
+                "title": "EngineSize",
+                "car": 1
+            },
+        )
+
+    def test_API_generic_serializer_list_retrieve(self):
+        response = self.client.get(
+            reverse("api:generic-list", args=["adminapi", "enginesize"]),
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(
+            response.content,
+            [
+                {
+                    "id": 1,
+                    "title": "EngineSize 1",
+                    "car": [1, 2]
+                },
+                {
+                    "id": 2,
+                    "title": "EngineSize 2",
+                    "car": [1]
+                }
+            ]
+        )
+
+    def test_API_no_matching_model_name_from_url_error_detail_get(self):
+        response = self.client.get(
+            reverse("api:generic-detail", args=["adminapi", "noneType", 2]),
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertJSONEqual(
+            response.content,
+            {
+                "detail": "Model or App does not exist"
+            }
+        )
+
+    def test_API_no_matching_model_name_from_url_error_list(self):
+        response = self.client.get(
+            reverse("api:generic-list", args=["noneApp", "noneType"]),
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertJSONEqual(
+            response.content,
+            {
+                "detail": "Model or App does not exist"
+            }
+        )
+
+    def test_API_no_matching_model_name_from_url_error_post(self):
+        response = self.client.post(
+            reverse("api:generic-list", args=["noneApp", "noneType"]),
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertJSONEqual(
+            response.content,
+            {
+                "detail": "Model or App does not exist"
+            }
+        )
+
+    def test_API_no_matching_model_name_from_url_error_put(self):
+        response = self.client.put(
+            reverse("api:generic-detail", args=["noneApp", "noneType", 2]),
         )
         self.assertEqual(response.status_code, 400)
         self.assertJSONEqual(

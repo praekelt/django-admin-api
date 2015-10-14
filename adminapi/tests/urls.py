@@ -6,9 +6,9 @@ from adminapi.tests import views
 
 router = DefaultRouter()
 router.register(
-    r"generic/(?P<app_name>\w+)/(?P<model_name>\w+)",
+    r"test-generic/(?P<app_name>\w+)/(?P<model_name>\w+)",
     views.GenericViewSet,
-    base_name="generic"
+    base_name="test-generic"
 )
 
 urlpatterns = patterns(
