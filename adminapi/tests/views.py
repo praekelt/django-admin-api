@@ -4,13 +4,13 @@ from django.http import Http404
 from django.shortcuts import render_to_response
 
 from rest_framework import viewsets, generics, views
+from rest_framework.exceptions import APIException
 from rest_framework.response import Response
 from rest_framework import status
 
-from adminapi import tests
 from adminapi.tests import serializers, registry
+from adminapi import tests
 
-from rest_framework.exceptions import APIException
 
 
 class ModelDoesNotExist(APIException):

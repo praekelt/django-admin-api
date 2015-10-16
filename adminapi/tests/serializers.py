@@ -28,3 +28,9 @@ class CarSerializer(serializers.ModelSerializer):
 class GenericSerializer(serializers.ModelSerializer):
     class Meta:
         model = None
+
+
+class ImageSerializer(serializers.ModelSerializer):
+    image = serializers.ImageField()
+    class Meta:
+        model = None
