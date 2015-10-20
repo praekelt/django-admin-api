@@ -6,7 +6,7 @@ from rest_framework import viewsets, generics
 from rest_framework.views import APIView
 from rest_framework.authtoken.models import Token
 from rest_framework import authentication
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 from rest_framework.response import Response
 from rest_framework import serializers
 from rest_framework import viewsets, versioning
@@ -74,6 +74,8 @@ class ModelDoesNotExist(APIException):
 
 
 class GenericViewSet(viewsets.ModelViewSet):
+    authentication_classes = (authentication.TokenAuthentication,)
+
     def get_queryset(self):
         model_name = self.request.resolver_match.kwargs.get("model_name")
         app_name = self.request.resolver_match.kwargs.get("app_name")
