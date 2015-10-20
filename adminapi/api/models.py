@@ -1,8 +1,5 @@
-import os
-
 from django.db import models
-
-RES_DIR = os.path.join(os.path.dirname(__file__+"../tests/"), "res")
+from django.conf import setting
 
 
 class Manufacturer(models.Model):
@@ -25,5 +22,4 @@ class EngineSize(models.Model):
 
 class ImageModel(models.Model):
     title = models.CharField(max_length=100, blank=True)
-    image = models.ImageField(upload_to=RES_DIR)
-
+    image = models.ImageField(upload_to=settings.MEDIA_ROOT + title)
