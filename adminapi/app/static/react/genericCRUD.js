@@ -586,6 +586,7 @@ var EngineSizeContainer = React.createClass({displayName: 'engine-size-form',
                 console.log('Retrieval success')
                 this.setState({engineSizeList: data});
                 this.props.provideData(data);
+                this.handleCancel();
             }.bind(this),
             error: function(xhr, status, err) {
                 if(xhr.status == 403) {
@@ -610,6 +611,7 @@ var EngineSizeContainer = React.createClass({displayName: 'engine-size-form',
                 console.log('Submit success')
                 alert('Successfully submitted');
                 this.retrieveData();
+                this.handleCancel();
             }.bind(this),
             error: function(xhr, status, err) {
                 console.warn(xhr.responseText);
@@ -764,6 +766,8 @@ var EngineSizeForm = React.createClass({displayName: 'engine-size-form',
                 />
                 <h2>Cars:</h2>
                 <CarsCheckList
+                    id={this.props.data.id}
+                    selectedCars={this.props.data.car}
                     cars={this.state.cars}
                     handleSelect={this.handleSelect}
                 />
@@ -777,7 +781,7 @@ var EngineSizeForm = React.createClass({displayName: 'engine-size-form',
 
 var CarsCheckList = React.createClass({displayName: 'checkboxes',
     getInitialState: function(){
-        return {data: null, carIds: [], checked: false};
+        return {data: null, carIds: []};
     },
     handleChange: function(e){
         console.log(e.target.checked);
@@ -791,11 +795,39 @@ var CarsCheckList = React.createClass({displayName: 'checkboxes',
             this.props.handleSelect(this.state.carIds);
         }
     },
+    componentWillReceiveProps: function(nextProps) {
+    },
+    shouldComponentUpdate: function(nextProps, nextState) {
+        if (nextProps.selectedCars == undefined) {
+            return true;
+        }
+        if(nextProps.id == this.props.id){
+            return false;
+        } else {
+            return true;
+        }
+    },
+    componentDidUpdate: function(prevProps, prevState) {
+        var checkboxes = document.getElementsByClassName('car-checkboxes');
+        for (i = 0; i < checkboxes.length; ++i) {
+            if(checkboxes[i].checked){
+                checkboxes[i].click();
+            }
+        }
+        for (i = 0; i < checkboxes.length; ++i) {
+                var value = parseInt(checkboxes[i].value);
+                if(this.props.selectedCars.indexOf(value, 0) >= 0){
+                    checkboxes[i].click();
+                }
+        }
+    },
     render: function() {
         var listItems = this.props.cars.map(function (car) {
             return (
-                <label key={"item" + car.id}>
+                <label
+                    key={"item" + car.id}>
                     <input
+                        className="car-checkboxes"
                         type="checkbox"
                         value={car.id}
                         onClick={this.handleChange}
