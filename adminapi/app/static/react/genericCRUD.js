@@ -49,6 +49,7 @@ var Form = React.createClass({
                     provideData={this.provideEngineSizeData}
                 />
                 <ImageModelContainer
+                    url={this.props.url}
                 />
             </div>
         );
@@ -907,7 +908,7 @@ function dataURItoBlob(dataURI) {
 var ImageModelContainer = React.createClass({displayName: 'image-model-form',
     retrieveData: function(data) {
         $.ajax({
-            url: '/api/v1/generic/demo/imagemodel/',
+            url: this.props.url + 'imagemodel/',
             dataType: 'json',
             type: 'GET',
             beforeSend: function (xhr) {
@@ -927,7 +928,7 @@ var ImageModelContainer = React.createClass({displayName: 'image-model-form',
     },
     handleSubmit: function(data) {
         $.ajax({
-            url: '/api/v1/generic/demo/imagemodel/',
+            url: this.props.url + 'imagemodel/',
             dataType: 'json',
             type: 'POST',
             data: data['formData'],
@@ -950,7 +951,7 @@ var ImageModelContainer = React.createClass({displayName: 'image-model-form',
     },
     handleUpdate: function(data) {
         $.ajax({
-            url: '/api/v1/generic/demo/imagemodel/'+ data.id + '/',
+            url: this.props.url + 'imagemodel/' + data.id +'/',
             dataType: 'json',
             type: 'PUT',
             data: data['formData'],
@@ -974,7 +975,7 @@ var ImageModelContainer = React.createClass({displayName: 'image-model-form',
     },
     handleDelete: function(data) {
         $.ajax({
-            url: '/api/v1/generic/demo/imagemodel/'+ data.id + '/',
+            url: this.props.url + 'imagemodel/' + data.id +'/',
             datatype: 'json',
             type: 'DELETE',
             beforeSend: function (xhr) {
