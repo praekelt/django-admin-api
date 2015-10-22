@@ -753,7 +753,7 @@ class ModelsTest(TestCase):
 
     """Test the generic viewset, urls and serialzier for the API
     """
-    def test_API_generic_serializer_item_create(self):
+    def test_api_generic_serializer_item_create(self):
         response = self.client.post(
             reverse("api:generic-list", args=["adminapi", "enginesize"]),
             {
@@ -762,7 +762,7 @@ class ModelsTest(TestCase):
             },
         )
 
-    def test_API_generic_serializer_list_retrieve(self):
+    def test_api_generic_serializer_list_retrieve(self):
         response = self.client.get(
             reverse("api:generic-list", args=["adminapi", "enginesize"]),
         )
@@ -783,7 +783,7 @@ class ModelsTest(TestCase):
             ]
         )
 
-    def test_API_no_matching_model_name_from_url_error_detail_get(self):
+    def test_api_no_matching_model_name_from_url_error_detail_get(self):
         response = self.client.get(
             reverse("api:generic-detail", args=["adminapi", "noneType", 2]),
         )
@@ -795,7 +795,7 @@ class ModelsTest(TestCase):
             }
         )
 
-    def test_API_no_matching_model_name_from_url_error_list(self):
+    def test_api_no_matching_model_name_from_url_error_list(self):
         response = self.client.get(
             reverse("api:generic-list", args=["noneApp", "noneType"]),
         )
@@ -807,7 +807,7 @@ class ModelsTest(TestCase):
             }
         )
 
-    def test_API_no_matching_model_name_from_url_error_post(self):
+    def test_api_no_matching_model_name_from_url_error_post(self):
         response = self.client.post(
             reverse("api:generic-list", args=["noneApp", "noneType"]),
         )
@@ -819,7 +819,7 @@ class ModelsTest(TestCase):
             }
         )
 
-    def test_API_no_matching_model_name_from_url_error_put(self):
+    def test_api_no_matching_model_name_from_url_error_put(self):
         response = self.client.put(
             reverse("api:generic-detail", args=["noneApp", "noneType", 2]),
         )
@@ -847,7 +847,7 @@ class MultiPartFormFieldTest(TestCase):
     def tearDownClass(cls):
         super(MultiPartFormFieldTest, cls).tearDownClass()
 
-    def test_image_upload_API(self):
+    def test_image_upload_api(self):
         client = APIClient()
         response = client.post(
             reverse("test-generic-list", args=["adminapi", "imagemodel"]),
@@ -860,12 +860,12 @@ class MultiPartFormFieldTest(TestCase):
         self.assertEqual(response.status_code, 201)
         # Test that image was saved to directory and then delete it
         self.assertTrue(os.path.isfile(glob.glob(RES_DIR + "/image_*.jpg")[0]))
-        os.remove(glob.glob(RES_DIR+"/image_*.jpg")[0])
+        os.remove(glob.glob(RES_DIR + "/image_*.jpg")[0])
         parsed_json = json.loads(response.content)
         self.assertEqual(parsed_json["title"], "Image model 2")
         self.assertEqual(parsed_json["id"], 2)
 
-    def test_image_update_API(self):
+    def test_image_update_api(self):
         client = APIClient()
         response = client.put(
             reverse("test-generic-detail", args=["adminapi", "imagemodel", 1]),
@@ -876,6 +876,6 @@ class MultiPartFormFieldTest(TestCase):
         )
         # Test that image was saved to directory and then delete it
         self.assertTrue(os.path.isfile(glob.glob(RES_DIR + "/image_*.jpg")[0]))
-        os.remove(glob.glob(RES_DIR+"/image_*.jpg")[0])
+        os.remove(glob.glob(RES_DIR + "/image_*.jpg")[0])
         parsed_json = json.loads(response.content)
         self.assertEqual(parsed_json["id"], 1)
