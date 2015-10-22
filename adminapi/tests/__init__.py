@@ -1,4 +1,7 @@
-import os, base64
+import base64
+import os
+import glob
+import json
 
 from django.test import TestCase
 from django.db import models
@@ -10,8 +13,13 @@ from django.conf import settings
 from rest_framework.test import APIRequestFactory, APIClient
 from rest_framework.authtoken.models import Token
 
+from adminapi import demo
+
+
 RES_DIR = os.path.join(os.path.dirname(__file__), "res")
 IMAGE_PATH = os.path.join(RES_DIR, "image.jpg")
+UPLOAD_DIR = os.path.join(RES_DIR, "adminapi/tests/res")
+
 
 class Manufacturer(models.Model):
     title = models.CharField(max_length=100)
@@ -465,6 +473,9 @@ class ModelsTest(TestCase):
     def tearDownClass(cls):
         super(ModelsTest, cls).tearDownClass()
 
+    """ Test a generic viewset, urls serializer
+    as well as parsing specific models defined in the url
+    """
     def test_car_model_api_list_response_success(self):
         response = self.client.get(
             reverse("test-generic-list", args=["adminapi", "car"]),
@@ -736,7 +747,9 @@ class ModelsTest(TestCase):
             }
         )
 
-    def test_API_generic_serializer_item_create(self):
+    """Test the generic viewset, urls and serialzier for the API
+    """
+    def test_api_generic_serializer_item_create(self):
         response = self.client.post(
             reverse("api:generic-list", args=["adminapi", "enginesize"]),
             {
@@ -745,7 +758,7 @@ class ModelsTest(TestCase):
             },
         )
 
-    def test_API_generic_serializer_list_retrieve(self):
+    def test_api_generic_serializer_list_retrieve(self):
         response = self.client.get(
             reverse("api:generic-list", args=["adminapi", "enginesize"]),
         )
@@ -766,7 +779,7 @@ class ModelsTest(TestCase):
             ]
         )
 
-    def test_API_no_matching_model_name_from_url_error_detail_get(self):
+    def test_api_no_matching_model_name_from_url_error_detail_get(self):
         response = self.client.get(
             reverse("api:generic-detail", args=["adminapi", "noneType", 2]),
         )
@@ -778,7 +791,7 @@ class ModelsTest(TestCase):
             }
         )
 
-    def test_API_no_matching_model_name_from_url_error_list(self):
+    def test_api_no_matching_model_name_from_url_error_list(self):
         response = self.client.get(
             reverse("api:generic-list", args=["noneApp", "noneType"]),
         )
@@ -790,7 +803,7 @@ class ModelsTest(TestCase):
             }
         )
 
-    def test_API_no_matching_model_name_from_url_error_post(self):
+    def test_api_no_matching_model_name_from_url_error_post(self):
         response = self.client.post(
             reverse("api:generic-list", args=["noneApp", "noneType"]),
         )
@@ -802,7 +815,7 @@ class ModelsTest(TestCase):
             }
         )
 
-    def test_API_no_matching_model_name_from_url_error_put(self):
+    def test_api_no_matching_model_name_from_url_error_put(self):
         response = self.client.put(
             reverse("api:generic-detail", args=["noneApp", "noneType", 2]),
         )
@@ -813,10 +826,27 @@ class ModelsTest(TestCase):
                 "detail": "Model or App does not exist"
             }
         )
-    def test_image_upload_API(self):
+
+
+class MultiPartFormFieldTest(TestCase):
+
+    def setUp(self):
+        self.client = APIClient()
+
+    @classmethod
+    def setUpClass(cls):
+        cls.image_model = demo.models.ImageModel()
+        cls.image_model.title = "Image model 1"
+        cls.image_model.save()
+
+    @classmethod
+    def tearDownClass(cls):
+        super(MultiPartFormFieldTest, cls).tearDownClass()
+
+    def test_image_upload_api(self):
         client = APIClient()
         response = client.post(
-            reverse("api:generic-list", args=["api", "imagemodel"]),
+            reverse("test-generic-list", args=["demo", "imagemodel"]),
             {
                 "title": "Image model 2",
                 "image": open(IMAGE_PATH)
@@ -825,3 +855,23 @@ class ModelsTest(TestCase):
         )
         self.assertEqual(response.status_code, 201)
         # Test that image was saved to directory and then delete it
+        self.assertTrue(os.path.isfile(glob.glob(RES_DIR + "/image.jpg")[0]))
+        os.remove(glob.glob(UPLOAD_DIR + "/image.jpg")[0])
+        parsed_json = json.loads(response.content)
+        self.assertEqual(parsed_json["title"], "Image model 2")
+        self.assertEqual(parsed_json["id"], 2)
+
+    def test_image_update_api(self):
+        client = APIClient()
+        response = client.put(
+            reverse("test-generic-detail", args=["demo", "imagemodel", 1]),
+            {
+                "image": open(IMAGE_PATH)
+            },
+            format="multipart"
+        )
+        # Test that image was saved to directory and then delete it
+        self.assertTrue(os.path.isfile(glob.glob(UPLOAD_DIR + "/image.jpg")[0]))
+        os.remove(glob.glob(UPLOAD_DIR + "/image.jpg")[0])
+        parsed_json = json.loads(response.content)
+        self.assertEqual(parsed_json["id"], 1)

@@ -907,7 +907,7 @@ function dataURItoBlob(dataURI) {
 var ImageModelContainer = React.createClass({displayName: 'image-model-form',
     retrieveData: function(data) {
         $.ajax({
-            url: '/api/v1/generic/api/imagemodel/',
+            url: '/api/v1/generic/demo/imagemodel/',
             dataType: 'json',
             type: 'GET',
             beforeSend: function (xhr) {
@@ -927,7 +927,7 @@ var ImageModelContainer = React.createClass({displayName: 'image-model-form',
     },
     handleSubmit: function(data) {
         $.ajax({
-            url: '/api/v1/generic/api/imagemodel/',
+            url: '/api/v1/generic/demo/imagemodel/',
             dataType: 'json',
             type: 'POST',
             data: data['formData'],
@@ -950,7 +950,7 @@ var ImageModelContainer = React.createClass({displayName: 'image-model-form',
     },
     handleUpdate: function(data) {
         $.ajax({
-            url: '/api/v1/generic/api/imagemodel/'+ data.id + '/',
+            url: '/api/v1/generic/demo/imagemodel/'+ data.id + '/',
             dataType: 'json',
             type: 'PUT',
             data: data['formData'],
@@ -974,7 +974,7 @@ var ImageModelContainer = React.createClass({displayName: 'image-model-form',
     },
     handleDelete: function(data) {
         $.ajax({
-            url: '/api/v1/generic/api/imagemodel/'+ data.id + '/',
+            url: '/api/v1/generic/demo/imagemodel/'+ data.id + '/',
             datatype: 'json',
             type: 'DELETE',
             beforeSend: function (xhr) {
@@ -1152,7 +1152,7 @@ var ImageModel = React.createClass({displayName: 'imagem-model',
 });
 
 ReactDOM.render(
-    React.createElement(Form,{url: '/api/v1/generic/adminapi/'}),
+    React.createElement(Form,{url: '/api/v1/generic/demo/'}),
     document.getElementById('generic')
 );
 

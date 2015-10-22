@@ -13,6 +13,7 @@ setup(
     install_requires=[
         "Django<1.7",
         "djangorestframework",
+        "Pillow<3.0.0",
     ],
     include_package_data=True,
     tests_require=[

@@ -20,6 +20,7 @@ class EngineSize(models.Model):
         related_name="engine_size"
     )
 
+
 class ImageModel(models.Model):
     title = models.CharField(max_length=100, blank=True)
     image = models.ImageField(upload_to=settings.MEDIA_ROOT)
