@@ -1,4 +1,7 @@
-import base64, os, glob, json
+import base64
+import os
+import glob
+import json
 
 from django.test import TestCase
 from django.db import models
@@ -856,7 +859,7 @@ class MultiPartFormFieldTest(TestCase):
         )
         self.assertEqual(response.status_code, 201)
         # Test that image was saved to directory and then delete it
-        self.assertTrue(os.path.isfile(glob.glob(RES_DIR+"/image_*.jpg")[0]))
+        self.assertTrue(os.path.isfile(glob.glob(RES_DIR + "/image_*.jpg")[0]))
         os.remove(glob.glob(RES_DIR+"/image_*.jpg")[0])
         parsed_json = json.loads(response.content)
         self.assertEqual(parsed_json["title"], "Image model 2")
@@ -871,9 +874,8 @@ class MultiPartFormFieldTest(TestCase):
             },
             format="multipart"
         )
-        import pdb
         # Test that image was saved to directory and then delete it
-        self.assertTrue(os.path.isfile(glob.glob(RES_DIR+"/image_*.jpg")[0]))
+        self.assertTrue(os.path.isfile(glob.glob(RES_DIR + "/image_*.jpg")[0]))
         os.remove(glob.glob(RES_DIR+"/image_*.jpg")[0])
         parsed_json = json.loads(response.content)
         self.assertEqual(parsed_json["id"], 1)

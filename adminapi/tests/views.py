@@ -12,7 +12,6 @@ from adminapi.tests import serializers, registry
 from adminapi import tests
 
 
-
 class ModelDoesNotExist(APIException):
     status_code = 400
     default_detail = "Model or App does not exist"
