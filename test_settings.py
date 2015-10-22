@@ -25,6 +25,6 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 )
 
 ROOT_URLCONF = 'adminapi.tests.urls'
-
+MEDIA_ROOT ='./images/'
 # xxx: get tests to pass with migrations
 SOUTH_TESTS_MIGRATE = False

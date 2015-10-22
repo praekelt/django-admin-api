@@ -1,14 +1,17 @@
-import base64
+import os, base64
 
 from django.test import TestCase
 from django.db import models
 from django.contrib.auth.models import User
 from django.test import RequestFactory
 from django.core.urlresolvers import reverse
+from django.conf import settings
 
 from rest_framework.test import APIRequestFactory, APIClient
 from rest_framework.authtoken.models import Token
 
+RES_DIR = os.path.join(os.path.dirname(__file__), "res")
+IMAGE_PATH = os.path.join(RES_DIR, "image.jpg")
 
 class Manufacturer(models.Model):
     title = models.CharField(max_length=100)
@@ -810,3 +813,15 @@ class ModelsTest(TestCase):
                 "detail": "Model or App does not exist"
             }
         )
+    def test_image_upload_API(self):
+        client = APIClient()
+        response = client.post(
+            reverse("api:generic-list", args=["api", "imagemodel"]),
+            {
+                "title": "Image model 2",
+                "image": open(IMAGE_PATH)
+            },
+            format="multipart"
+        )
+        self.assertEqual(response.status_code, 201)
+        # Test that image was saved to directory and then delete it

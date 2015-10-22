@@ -11,6 +11,7 @@ from rest_framework.response import Response
 from rest_framework import serializers
 from rest_framework import viewsets, versioning
 from rest_framework.exceptions import APIException
+from rest_framework import parsers 
 
 from adminapi.api.serializers import UserSerializer, GenericSerializer
 from adminapi.api import registry, serializers
@@ -75,6 +76,7 @@ class ModelDoesNotExist(APIException):
 
 class GenericViewSet(viewsets.ModelViewSet):
     authentication_classes = (authentication.TokenAuthentication,)
+    parser_classes = (parsers.MultiPartParser, parsers.FormParser, parsers.JSONParser)
 
     def get_queryset(self):
         model_name = self.request.resolver_match.kwargs.get("model_name")

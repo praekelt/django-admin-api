@@ -1,5 +1,5 @@
 from django.db import models
-from django.conf import setting
+from django.conf import settings
 
 
 class Manufacturer(models.Model):
@@ -22,4 +22,4 @@ class EngineSize(models.Model):
 
 class ImageModel(models.Model):
     title = models.CharField(max_length=100, blank=True)
-    image = models.ImageField(upload_to=settings.MEDIA_ROOT + title)
+    image = models.ImageField(upload_to=settings.MEDIA_ROOT)

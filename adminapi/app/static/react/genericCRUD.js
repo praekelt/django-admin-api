@@ -12,6 +12,9 @@ function errorCompiler(data) {
     if(data.title){
         errorString += '\n Title: ' + data.title;
     }
+    if(data.image) {
+        errorString += '\n Image: ' + data.image;
+    }
     return errorString;
 }
 
@@ -44,6 +47,8 @@ var Form = React.createClass({
                     url={this.props.url}
                     carData={this.state.carData}
                     provideData={this.provideEngineSizeData}
+                />
+                <ImageModelContainer
                 />
             </div>
         );
@@ -254,7 +259,7 @@ var ManufacturerList = React.createClass({displayName: 'manufactuer-list',
                 <tbody>
                     <tr>
                         <th>id</th>
-                        <th C>Manufacturer name</th>
+                        <th>Manufacturer name</th>
                     </tr>
                     {listItems}
                 </tbody>
@@ -531,7 +536,6 @@ var CarList = React.createClass({displayName: 'car-list',
         var listItems = this.props.data.map(function (car) {
             return (
                 <Car
-                    key={car.id}
                     data={car}
                     handleClick={this.handleClick.bind(this, car)}
                 />
@@ -562,7 +566,7 @@ var Car = React.createClass({displayName: 'car',
 
     render: function() {
         return (
-            <tr id={"item-"+this.props.data.id}>
+            <tr key={"item-"+this.props.data.id}>
                 <td>{this.props.data.id}</td>
                 <td><a onClick={this.handleClick} href=''> {this.props.data.title}</a></td>
                 <td>{this.props.data.manufacturer}</td>
@@ -808,7 +812,11 @@ var CarsCheckList = React.createClass({displayName: 'checkboxes',
         }
     },
     componentDidUpdate: function(prevProps, prevState) {
+        console.log('Checklist component updated');
         var checkboxes = document.getElementsByClassName('car-checkboxes');
+        if(this.props.selectedCars == undefined){
+            return
+        }
         for (i = 0; i < checkboxes.length; ++i) {
             if(checkboxes[i].checked){
                 checkboxes[i].click();
@@ -890,6 +898,259 @@ var EngineSize = React.createClass({displayName: 'engine-size',
         );
     }
 });
+
+function dataURItoBlob(dataURI) {
+    var arr = dataURI.split(','), mime = arr[0].match(/:(.*?);/)[1];
+    return new Blob([atob(arr[1])], {type: 'image/png'});
+}
+
+var ImageModelContainer = React.createClass({displayName: 'image-model-form',
+    retrieveData: function(data) {
+        $.ajax({
+            url: '/api/v1/generic/api/imagemodel/',
+            dataType: 'json',
+            type: 'GET',
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader('Authorization', 'Token ' + Cookies.getJSON('token').token);
+            }.bind(this),
+            cache: false,
+            success: function(data) {
+                console.log('Retrieval success')
+                this.setState({imageModelList: data});
+            }.bind(this),
+            error: function(xhr, status, err) {
+                if(xhr.status == 403) {
+                    window.location.replace('/permission-denied/')
+                }
+            }.bind(this)
+        });
+    },
+    handleSubmit: function(data) {
+        $.ajax({
+            url: '/api/v1/generic/api/imagemodel/',
+            dataType: 'json',
+            type: 'POST',
+            data: data['formData'],
+            contentType: false,
+            processData: false,
+            beforeSend: function (xhr) {
+               xhr.setRequestHeader('Authorization', 'Token ' + Cookies.getJSON('token').token);
+            }.bind(this),
+            success: function(data) {
+                console.log('Submit success')
+                alert('Successfully submitted');
+                this.retrieveData();
+            }.bind(this),
+            error: function(xhr, status, err) {
+                console.warn(xhr.responseText);
+                jsonError = JSON.parse(xhr.responseText);
+                alert(errorCompiler(jsonError));
+            }.bind(this)
+        });
+    },
+    handleUpdate: function(data) {
+        $.ajax({
+            url: '/api/v1/generic/api/imagemodel/'+ data.id + '/',
+            dataType: 'json',
+            type: 'PUT',
+            data: data['formData'],
+            contentType: false,
+            processData: false,
+            beforeSend: function (xhr) {
+               xhr.setRequestHeader('Authorization', 'Token ' + Cookies.getJSON('token').token);
+            }.bind(this),
+            cache: false,
+            success: function(data) {
+                console.log('Update success');
+                alert('Successfully updated');
+                this.retrieveData();
+            }.bind(this),
+            error: function(xhr, status, err) {
+                jsonError = JSON.parse(xhr.responseText);
+                console.warn(xhr.responseText);
+                alert(errorCompiler(jsonError));
+            }.bind(this)
+        });
+    },
+    handleDelete: function(data) {
+        $.ajax({
+            url: '/api/v1/generic/api/imagemodel/'+ data.id + '/',
+            datatype: 'json',
+            type: 'DELETE',
+            beforeSend: function (xhr) {
+               xhr.setRequestHeader('Authorization', 'Token ' + Cookies.getJSON('token').token);
+            }.bind(this),
+            cache: false,
+            success: function(data) {
+                alert('Successfully deleted');
+                console.log('Delete success');
+                this.retrieveData();
+                this.handleCancel();
+            }.bind(this),
+            error: function(xhr, status, err) {
+                console.error(xhr.responseText);
+            }.bind(this)
+        });
+    },
+    handleCancel: function() {
+        this.setState({formData: {}});
+    },
+    selectListItem: function(data) {
+        this.setState({formData: data});
+    },
+    getInitialState: function() {
+        return {data: {}, formData: {}, imageModelList: []};
+    },
+    componentDidMount: function() {
+        this.retrieveData();
+    },
+
+    render: function() {
+        return (
+            <div>
+            <h1>Image form</h1>
+            <ImageForm
+                data={this.state.formData}
+                onSubmit={this.handleSubmit}
+                onUpdate={this.handleUpdate}
+                onDelete={this.handleDelete}
+                handleCancel={this.handleCancel}
+            />
+            <ImageModelList
+                data={this.state.imageModelList}
+                handleItemSelect={this.selectListItem}
+            />
+            </div>
+        );
+    }
+});
+
+var ImageForm = React.createClass({displayName: 'image-form',
+    mixins: [React.addons.LinkedStateMixin],
+    getInitialState: function() {
+        return {data_uri: null};
+    },
+    handleSubmit: function(e) {
+        e.preventDefault();
+        var title = ReactDOM.findDOMNode(this.refs.title).value.trim();
+        var image = ReactDOM.findDOMNode(this.refs.image).files[0];
+        // Final catch if HTML5 validation fails
+        if(!title) {
+            alert('Please fill in the title field');
+            return;
+        }
+        var formData = new FormData();
+        formData.append('title', title);
+
+        if(image != null) {
+            formData.append('image', image);
+        }else{
+            alert('Please attach an image file');
+            return
+        }
+
+        if(this.props.data.id == null) {
+            this.props.onSubmit({
+                formData: formData
+            });
+        } else {
+                formData.append('id', this.props.data.id);
+            this.props.onUpdate({
+                formData: formData,
+                id: this.props.data.id
+            });
+        }
+    },
+    handleDelete: function() {
+        if(this.props.data.id != null) {
+            if(confirm('Are you sure you want to delete this item?')){
+                this.props.onDelete({id: this.props.data.id});
+            }
+        } else {
+            alert('Please select a item to delete')
+        }
+    },
+    handleCancel: function() {
+        this.setState({value: ''});
+        this.props.handleCancel();
+    },
+    componentWillReceiveProps: function(nextProps) {
+        this.setState({
+            title: nextProps.data.title,
+        });
+    },
+    render: function() {
+        return (
+            <form
+                className="image-form"
+                onSubmit={this.handleSubmit}
+            >
+                <h2>Title:</h2>
+                <input
+                    type="text"
+                    valueLink={this.linkState('title')}
+                    placeholder="Add title"
+                    ref="title"
+                    maxLength="32"
+                    required
+                />
+                <h2>Image:</h2>
+                <input ref="image" id="image-file" type="file"/>
+                <input type="submit" value="Submit" />
+                <input onClick={this.handleDelete} type="button" value="Delete" />
+                <input onClick={this.handleCancel} type="button" value="Cancel" />
+            </form>
+        );
+    }
+});
+
+var ImageModelList = React.createClass({displayName: 'image-model-list',
+    handleClick: function(imageModel){
+        this.props.handleItemSelect(imageModel);
+    },
+
+    render: function() {
+        var listItems = this.props.data.map(function (imageModel) {
+            return (
+                <ImageModel
+                    key={imageModel.id}
+                    data={imageModel}
+                    handleClick={this.handleClick.bind(this, imageModel)}
+                />
+            );
+        }.bind(this));
+        return(
+            <table className="imageTable">
+                <tbody>
+                    <tr>
+                        <th>id</th>
+                        <th C>Image</th>
+                        <th>URL</th>
+                    </tr>
+                    {listItems}
+                </tbody>
+            </table>
+        );
+    }
+});
+
+var ImageModel = React.createClass({displayName: 'imagem-model',
+    handleClick: function(e){
+        e.preventDefault();
+        this.props.handleClick(this.props.data);
+    },
+
+    render: function() {
+        return (
+            <tr id={"item-"+this.props.data.id}>
+                <td>{this.props.data.id}</td>
+                <td><a onClick={this.handleClick} href=''> {this.props.data.title}</a></td>
+                <td>{this.props.data.image}</td>
+            </tr>
+        );
+    }
+});
+
 ReactDOM.render(
     React.createElement(Form,{url: '/api/v1/generic/adminapi/'}),
     document.getElementById('generic')
