@@ -10,6 +10,11 @@ router.register(
     views.GenericViewSet,
     base_name="test-generic"
 )
+router.register(
+    r"test-image/(?P<app_name>\w+)/(?P<model_name>\w+)",
+    views.GenericViewSet,
+    base_name="test-image"
+)
 
 urlpatterns = patterns(
     "",
