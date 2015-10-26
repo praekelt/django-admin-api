@@ -15,7 +15,7 @@ var AdminContainer = React.createClass({displayName: 'admin-container',
         });
     },
     handleListState: function(data) {
-        console.log('liststate update');
+        console.log('List state update');
         switch(data['model']) {
             case 'post':
                 this.setState({postList: data['data']});
@@ -28,7 +28,7 @@ var AdminContainer = React.createClass({displayName: 'admin-container',
         }
     },
     handleSelect: function(data) {
-        console.log('selected');
+        console.log('Item selected');
         switch(data['model']) {
             case 'post':
                 this.setState({post: data['data']});
@@ -41,7 +41,7 @@ var AdminContainer = React.createClass({displayName: 'admin-container',
         }
     },
     handleCancel: function(data) {
-        console.log('cance');
+        console.log('Cancel');
         switch(data['model']) {
             case 'post':
                 this.setState({post: {}});
@@ -80,7 +80,6 @@ var AdminContainer = React.createClass({displayName: 'admin-container',
     handleSubmit: function(data) {
         var model = data['model'];
         var app = data['app'];
-        console.log(data);
         $.ajax({
             url: this.props.url + app + '/' + model + '/',
             dataType: 'json',
@@ -98,14 +97,12 @@ var AdminContainer = React.createClass({displayName: 'admin-container',
             }.bind(this),
             error: function(xhr, status, err) {
                 this.setState({error: xhr});
-                console.log(xhr);
             }.bind(this)
         });
     },
     handleUpdate: function(data) {
         var model = data['model'];
         var app = data['app'];
-        console.log(data);
         $.ajax({
             url: this.props.url + app + '/' + model + '/' + data['id'] + '/',
             dataType: 'json',
@@ -228,31 +225,22 @@ var PostForm = React.createClass({
         this.props.handleCancel({model: 'post'});
     },
     componentWillReceiveProps: function(nextProps) {
-        console.log('props incoming');
+        console.log('Props incoming');
         var data ={};
         for(var field in nextProps.data) {
-            if(nextProps.data[field] != undefined){
-                data[field] = nextProps.data[field];
-            }
+            data[field] = nextProps.data[field];
         }
-        console.log(data);
         this.setState(
            data
         );
-        if(nextProps.data.description == undefined) {
-            this.setState({
-                description: '',
-            })
-        }
-        if(nextProps.data.crop_from == undefined) {
-            this.setState({
-                crop_from: ''
-            })
-        }
-        if(nextProps.data.crop_from == undefined) {
-            this.setState({
-                sites: ''
-            })
+        if(jQuery.isEmptyObject(nextProps.data)) {
+            var clearData = {};
+            for(var field in this.state) {
+                if(field != 'fieldData'){
+                    clearData[field] = '';
+                }
+            }
+            this.setState(clearData);
         }
     },
     componentDidMount: function() {
