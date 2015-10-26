@@ -13,6 +13,11 @@ urlpatterns = patterns(
         name='login'
     ),
     url(
+        '^admin/$',
+        TemplateView.as_view(template_name='react/admin.html'),
+        name='admin'
+    ),
+    url(
         '^users/$',
         TemplateView.as_view(template_name='react/user-admin.html'),
         name='user-admin'

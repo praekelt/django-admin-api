@@ -74,6 +74,8 @@ class ModelDoesNotExist(APIException):
 
 
 class GenericViewSet(viewsets.ModelViewSet):
+    authentication_classes = (authentication.TokenAuthentication,)
+
     def get_queryset(self):
         model_name = self.request.resolver_match.kwargs.get("model_name")
         app_name = self.request.resolver_match.kwargs.get("app_name")
