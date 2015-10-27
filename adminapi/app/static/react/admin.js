@@ -266,7 +266,7 @@ var PostForm = React.createClass({
     render: function() {
         var siteList = this.state.fieldData.map(function (site) {
             return (
-                <option key={site.id} value={"site.id"}>{site.name}</option>
+                <option key={site.id} value={site.id}>{site.name}</option>
             );
         }.bind(this));
         return (
