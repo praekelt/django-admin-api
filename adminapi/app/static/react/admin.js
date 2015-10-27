@@ -53,7 +53,7 @@ var AdminContainer = React.createClass({displayName: 'admin-container',
                 return
         }
     },
-    // Make a GET request to model Type of choice and recieve list of all objects
+    // Make a GET request to model Type of choice and receive list of all objects
     retrieveData: function(data) {
         var model = data['model'];
         var app = data['app'];
@@ -115,7 +115,7 @@ var AdminContainer = React.createClass({displayName: 'admin-container',
             }.bind(this),
             cache: false,
             success: function(data) {
-                console.log('Update of ' + model + ' data successful');
+                console.info('Update of ' + model + ' data successful');
                 this.retrieveData({model: model, app: app});
                 // Re update form data, to keep form from reverting to previous incoming data
                 this.handleSelect({model: model, app: app, data});
@@ -137,7 +137,7 @@ var AdminContainer = React.createClass({displayName: 'admin-container',
             }.bind(this),
             cache: false,
             success: function(data) {
-                console.log('Deletion of ' + model + ' data successful');
+                console.info('Deletion of ' + model + ' data successful');
                 this.retrieveData({model: model, app: app});
             }.bind(this),
             error: function(xhr, status, err) {
@@ -173,7 +173,8 @@ var PostForm = React.createClass({
     getInitialState: function() {
         return {
             value: '',
-            fieldData: []
+            fieldData: [],
+            sites: []
         };
     },
     retrieveFieldData: function(data) {
@@ -226,17 +227,26 @@ var PostForm = React.createClass({
     },
     componentWillReceiveProps: function(nextProps) {
         console.log('Props incoming');
-        var data ={};
-        for(var field in nextProps.data) {
-            data[field] = nextProps.data[field];
-        }
+        console.log(nextProps.data);
+        /**
+         * Set multiselect field values using jQuery so no state data has to be handled.
+         * In the future this will need to programatically check if the field is a multi-elect
+        **/
+        $('select[name=sites]').val(nextProps.data.sites);
+        /**
+         * Updates state data with new incoming values
+        **/
         this.setState(
-           data
+           nextProps.data
         );
-        if(jQuery.isEmptyObject(nextProps.data)) {
+        /**
+         * If the next incoming props is empty, it clears out all the fields except
+         * the site list explicitly.
+        **/
+        if (jQuery.isEmptyObject(nextProps.data)) {
             var clearData = {};
-            for(var field in this.state) {
-                if(field != 'fieldData'){
+            for (var field in this.state) {
+                if (field != 'fieldData') {
                     clearData[field] = '';
                 }
             }
@@ -244,7 +254,14 @@ var PostForm = React.createClass({
         }
     },
     componentDidMount: function() {
+        /**
+         * Use the inner ajax function to hit the api and obtain info on other model dependencies
+         * that are required for fields
+        **/
         this.retrieveFieldData({app: 'sites', model: 'site'});
+    },
+    onKeyPress: function(e) {
+        console.log(e);
     },
     render: function() {
         var siteList = this.state.fieldData.map(function (site) {
@@ -256,11 +273,11 @@ var PostForm = React.createClass({
             <form className="posts" ref="posts" encType="multipart/form-data">
                 <div>
                     <label>Title</label>
-                    <input valueLink={this.linkState('title')} type="text" name="title"/>
+                    <input valueLink={this.linkState('title')} type="text" name="title" />
                 </div>
                 <div>
                     <label>Image</label>
-                    <input type="file" name="image"/>
+                    <input type="file" name="image" />
                 </div>
                 <div>
                     <label>Crop form</label>
@@ -275,19 +292,19 @@ var PostForm = React.createClass({
                 </div>
                 <div>
                     <label>Publish on</label>
-                    <input valueLink={this.linkState('publish_on')} type="datetime-local" name="publish_on"/>
+                    <input valueLink={this.linkState('publish_on')} type="datetime-local" name="publish_on" />
                 </div>
                 <div>
                     <label>Retract on</label>
-                    <input valueLink={this.linkState('retract_on')} type="datetime-local" name="retract_on"/>
+                    <input valueLink={this.linkState('retract_on')} type="datetime-local" name="retract_on" />
                 </div>
                 <div>
                     <label>Slug</label>
-                    <input valueLink={this.linkState('slug')} type="text" name="slug"/>
+                    <input valueLink={this.linkState('slug')} type="text" name="slug" />
                 </div>
                 <div>
                     <label>Subtitle</label>
-                    <input valueLink={this.linkState('subtitle')} type="text" name="subtitle"/>
+                    <input valueLink={this.linkState('subtitle')} type="text" name="subtitle" />
                 </div>
                 <div>
                     <label>Description</label>
@@ -295,22 +312,26 @@ var PostForm = React.createClass({
                 </div>
                 <div>
                     <label>Created date & time</label>
-                    <input valueLink={this.linkState('created')} type="datetime-local" name="created"/>
+                    <input valueLink={this.linkState('created')} type="datetime-local" name="created" />
                 </div>
                 <div>
                     <label>Liking Closed</label>
-                    <input type="checkbox" value="true" checkedLink={this.linkState('likes_closed')} name="likes_closed"/>
+                    <input type="checkbox" value="true" checkedLink={this.linkState('likes_closed')} name="likes_closed" />
                 </div>
                 <div>
                     <label>Liking enabled</label>
-                    <input type="checkbox" value="true" checkedLink={this.linkState('likes_enabled')} name="likes_enabled"/>
+                    <input type="checkbox" value="true" checkedLink={this.linkState('likes_enabled')} name="likes_enabled" />
                 </div>
                 <div>
                     <label>Owner override</label>
-                    <input valueLink={this.linkState('owner_override')} type="text" name="owner_override"/>
+                    <input valueLink={this.linkState('owner_override')} type="text" name="owner_override" />
                 </div>
                 <div>
-                    <select name="sites" valueLink={this.linkState('sites')} multiple>
+                    <select
+                        name="sites"
+                        defaulValue=""
+                        multiple
+                     >
                         {siteList}
                     </select>
                 </div>
@@ -372,7 +393,7 @@ var Post = React.createClass({displayName: 'post',
         return (
             <tr id={"item-"+this.props.data.id}>
                 <td>{this.props.data.id}</td>
-                <td><a onClick={this.handleClick} href=''> {this.props.data.title}</a></td>
+                <td><a onClick={this.handleClick} href=""> {this.props.data.title}</a></td>
             </tr>
         );
     }
