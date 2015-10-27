@@ -266,7 +266,7 @@ var PostForm = React.createClass({
     render: function() {
         var siteList = this.state.fieldData.map(function (site) {
             return (
-                <option key={site.id} value={site.id}>{site.name}</option>
+                <option key={site.id} value={"site.id"}>{site.name}</option>
             );
         }.bind(this));
         return (
@@ -393,7 +393,7 @@ var Post = React.createClass({displayName: 'post',
         return (
             <tr id={"item-"+this.props.data.id}>
                 <td>{this.props.data.id}</td>
-                <td><a onClick={this.handleClick} href=""> {this.props.data.title}</a></td>
+                <td><a onClick={this.handleClick} href="">{this.props.data.title}</a></td>
             </tr>
         );
     }
