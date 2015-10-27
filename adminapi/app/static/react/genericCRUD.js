@@ -735,7 +735,7 @@ var EngineSizeForm = React.createClass({displayName: 'engine-size-form',
                 this.props.onDelete({id: this.props.data.id});
             }
         } else {
-            alert('Please select a item to delete')
+            alert('Please select an item to delete')
         }
     },
     handleCancel: function() {
