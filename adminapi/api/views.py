@@ -6,11 +6,12 @@ from rest_framework import viewsets, generics
 from rest_framework.views import APIView
 from rest_framework.authtoken.models import Token
 from rest_framework import authentication
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 from rest_framework.response import Response
 from rest_framework import serializers
 from rest_framework import viewsets, versioning
 from rest_framework.exceptions import APIException
+from rest_framework import parsers
 
 from adminapi.api.serializers import UserSerializer, GenericSerializer
 from adminapi.api import registry, serializers

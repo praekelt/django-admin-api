@@ -1,0 +1,9 @@
+{% extends "react_base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Generic forms" %}{% endblock %}
+{% block content %}
+    {% load static from staticfiles %}
+    <div id="generic"></div>
+    <script type="text/jsx" src="{% static "react/genericCRUD.js" %}"></script>
+    <link href="{% static "css/generic.css" %}" rel="stylesheet" type="text/css" />
+{% endblock %}

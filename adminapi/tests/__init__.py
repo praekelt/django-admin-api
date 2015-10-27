@@ -8,14 +8,17 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.test import RequestFactory
 from django.core.urlresolvers import reverse
+from django.conf import settings
 
 from rest_framework.test import APIRequestFactory, APIClient
 from rest_framework.authtoken.models import Token
 
-import adminapi
+from adminapi import demo
+
 
 RES_DIR = os.path.join(os.path.dirname(__file__), "res")
 IMAGE_PATH = os.path.join(RES_DIR, "image.jpg")
+UPLOAD_DIR = os.path.join(RES_DIR, "adminapi/tests/res")
 
 
 class Manufacturer(models.Model):
@@ -41,13 +44,6 @@ class EngineSize(models.Model):
     )
 
 models.register_models("tests", EngineSize)
-
-
-class ImageModel(models.Model):
-    title = models.CharField(max_length=100, blank=True)
-    image = models.ImageField(upload_to=RES_DIR)
-
-models.register_models("tests", ImageModel)
 
 
 class LoginTest(TestCase):
@@ -839,7 +835,7 @@ class MultiPartFormFieldTest(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.image_model = ImageModel()
+        cls.image_model = demo.models.ImageModel()
         cls.image_model.title = "Image model 1"
         cls.image_model.save()
 
@@ -850,7 +846,7 @@ class MultiPartFormFieldTest(TestCase):
     def test_image_upload_api(self):
         client = APIClient()
         response = client.post(
-            reverse("test-generic-list", args=["adminapi", "imagemodel"]),
+            reverse("test-generic-list", args=["demo", "imagemodel"]),
             {
                 "title": "Image model 2",
                 "image": open(IMAGE_PATH)
@@ -859,8 +855,8 @@ class MultiPartFormFieldTest(TestCase):
         )
         self.assertEqual(response.status_code, 201)
         # Test that image was saved to directory and then delete it
-        self.assertTrue(os.path.isfile(glob.glob(RES_DIR + "/image_*.jpg")[0]))
-        os.remove(glob.glob(RES_DIR + "/image_*.jpg")[0])
+        self.assertTrue(os.path.isfile(glob.glob(RES_DIR + "/image.jpg")[0]))
+        os.remove(glob.glob(UPLOAD_DIR + "/image.jpg")[0])
         parsed_json = json.loads(response.content)
         self.assertEqual(parsed_json["title"], "Image model 2")
         self.assertEqual(parsed_json["id"], 2)
@@ -868,14 +864,14 @@ class MultiPartFormFieldTest(TestCase):
     def test_image_update_api(self):
         client = APIClient()
         response = client.put(
-            reverse("test-generic-detail", args=["adminapi", "imagemodel", 1]),
+            reverse("test-generic-detail", args=["demo", "imagemodel", 1]),
             {
                 "image": open(IMAGE_PATH)
             },
             format="multipart"
         )
         # Test that image was saved to directory and then delete it
-        self.assertTrue(os.path.isfile(glob.glob(RES_DIR + "/image_*.jpg")[0]))
-        os.remove(glob.glob(RES_DIR + "/image_*.jpg")[0])
+        self.assertTrue(os.path.isfile(glob.glob(UPLOAD_DIR + "/image.jpg")[0]))
+        os.remove(glob.glob(UPLOAD_DIR + "/image.jpg")[0])
         parsed_json = json.loads(response.content)
         self.assertEqual(parsed_json["id"], 1)

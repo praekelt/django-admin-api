@@ -15,7 +15,7 @@ INSTALLED_APPS = (
     'rest_framework',
     'rest_framework.authtoken',
     'adminapi',
-    'adminapi.tests',
+    'adminapi.demo',
     'adminapi.app',
     'adminapi.api',
 )
@@ -32,6 +32,6 @@ REST_FRAMEWORK = {
     )
 }
 ROOT_URLCONF = 'adminapi.tests.urls'
-
+MEDIA_ROOT = 'adminapi/tests/res'
 # xxx: get tests to pass with migrations
 SOUTH_TESTS_MIGRATE = False

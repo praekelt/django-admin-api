@@ -22,6 +22,16 @@ urlpatterns = patterns(
         TemplateView.as_view(template_name="react/user-admin.html"),
         name="user-admin"
     ),
+    url(
+        "^generic/$",
+        TemplateView.as_view(template_name="react/genericCRUD.html"),
+        name="generic"
+    ),
+    url(
+        "^imagemodel/$",
+        TemplateView.as_view(template_name="react/imageModel.html"),
+        name="generic"
+    ),
     # Template urls
     url(
         "^permission-denied/",
