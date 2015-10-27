@@ -5,22 +5,27 @@ from rest_framework.routers import DefaultRouter
 
 
 urlpatterns = patterns(
-    '',
+    "",
     # Single Page App template views(Currently using React)
     url(
-        '^login/$',
-        TemplateView.as_view(template_name='react/login.html'),
-        name='login'
+        "^login/$",
+        TemplateView.as_view(template_name="react/login.html"),
+        name="login"
     ),
     url(
-        '^users/$',
-        TemplateView.as_view(template_name='react/user-admin.html'),
-        name='user-admin'
+        "^admin/$",
+        TemplateView.as_view(template_name="react/admin.html"),
+        name="admin"
+    ),
+    url(
+        "^users/$",
+        TemplateView.as_view(template_name="react/user-admin.html"),
+        name="user-admin"
     ),
     # Template urls
     url(
-        '^permission-denied/',
-        TemplateView.as_view(template_name='error/permission_denied.html'),
-        name='permission-denied'
+        "^permission-denied/",
+        TemplateView.as_view(template_name="error/permission_denied.html"),
+        name="permission-denied"
     ),
 )

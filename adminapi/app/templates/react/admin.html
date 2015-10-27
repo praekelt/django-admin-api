@@ -1,0 +1,8 @@
+{% extends "react_base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Admin" %}{% endblock %}
+{% block content %}
+    {% load static from staticfiles %}
+    <div id="admin"></div>
+    <script type="text/jsx" src="{% static "react/admin.js" %}"></script>
+{% endblock %}

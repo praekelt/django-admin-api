@@ -31,7 +31,7 @@ var LoginContainer = React.createClass({displayName: 'ReactLogin',
                 console.log('state set');
                 Cookies.set('token', data, {expires: 1}, {secure: true});
                 console.log('Cookie data set');
-                window.location = '/app/users/';
+                window.location = '/adminapi/app/admin/';
             }.bind(this),
             error: function(xhr, status, err) {
                 jsonError = JSON.parse(xhr.responseText);
@@ -71,7 +71,7 @@ var LoginForm = React.createClass({displayName: 'LoginForm',
 });
 
 React.render(
-    React.createElement(LoginContainer,{url: '/api/v1/login/'}),
+    React.createElement(LoginContainer,{url: '/adminapi/api/v1/login/'}),
     document.getElementById('login')
 );
 
