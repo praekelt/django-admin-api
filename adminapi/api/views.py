@@ -1,8 +1,9 @@
 from django.contrib.auth.models import User
 from django.contrib.contenttypes import models
-from django.core import exceptions
+from django.core import exceptions, serializers
+from django.forms.models import fields_for_model
 
-from rest_framework import viewsets, generics
+from rest_framework import viewsets, generics, views
 from rest_framework.views import APIView
 from rest_framework.authtoken.models import Token
 from rest_framework import authentication
@@ -14,7 +15,7 @@ from rest_framework.exceptions import APIException
 from rest_framework import parsers
 
 from adminapi.api.serializers import UserSerializer, GenericSerializer
-from adminapi.api import registry, serializers
+from adminapi.api import registry, serializers, fields
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -107,3 +108,19 @@ class GenericViewSet(viewsets.ModelViewSet):
             return serializer
         except (exceptions.ObjectDoesNotExist):
             raise ModelDoesNotExist()
+
+
+class SchemaView(views.APIView):
+
+    def get(self, request, *args, **kwargs):
+        model_name = self.request.resolver_match.kwargs.get("model_name")
+        app_label = self.request.resolver_match.kwargs.get("app_label")
+        model = models.ContentType.objects.get(
+                app_label=app_label,
+                model=model_name
+            ).model_class()
+        model_field_data = model._meta.fields
+        li = []
+        for field in model_field_data:
+            li.append(fields.field_to_dict(field))
+        return Response(li)

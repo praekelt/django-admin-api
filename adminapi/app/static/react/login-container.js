@@ -1,4 +1,5 @@
 // Acquire csrf token and set token header for all subsequent ajax calls
+//TODO move this out to custom.js
 var csrftoken = Cookies.get('csrftoken');
 $(function () {
     function csrfSafeMethod(method) {

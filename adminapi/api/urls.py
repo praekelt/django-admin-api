@@ -7,7 +7,7 @@ from adminapi.api import views
 
 
 router = DefaultRouter()
-router.register(r'users', views.UserViewSet, base_name='users')
+router.register(r"users", views.UserViewSet, base_name="users")
 router.register(
     r"generic/(?P<app_name>\w+)/(?P<model_name>\w+)",
     views.GenericViewSet,
@@ -15,9 +15,11 @@ router.register(
 )
 
 urlpatterns = patterns(
-    '',
+    "",
     # RestFramework views
-    url(r'^v1/login/$', views.LoginView.as_view(), name='login'),
+    url(r"^v1/login/$", views.LoginView.as_view(), name="login"),
     # Rest Router urls
-    url(r'^v1/', include(router.urls)),
+    url(r"^v1/", include(router.urls)),
+    # Schema url
+    url(r"^v1/(?P<app_label>\w+)/(?P<model_name>\w+)/schema/$", views.SchemaView.as_view(), name="schema"),
 )
