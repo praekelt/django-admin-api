@@ -5,6 +5,7 @@
  * Ajax calls to be made in the top most container
 **/
 var AdminContainer = React.createClass({displayName: 'admin-container',
+    // model_name and app-label should later reflect any app/model combination to build a form for
     getInitialState: function() {
         return({
             model_name: 'post',
@@ -16,17 +17,19 @@ var AdminContainer = React.createClass({displayName: 'admin-container',
         });
     },
     handleListState: function(data) {
+        // Supply list element with data
         this.setState({listData: data['data']});
     },
     handleSelect: function(data) {
+        // Pass selected list element data to form
         this.setState({formData: data['data']});
     },
     // Make a GET request to model Type of choice and receive list of all objects
     retrieveData: function(data) {
-        console.log(data);
         var url = new String();
         var schema = new String();
         var request = data['request'];
+        // Picks url conf based on whether form or list requested data
         if(request == 'list') {
             url = this.props.url
         }else{
@@ -51,7 +54,7 @@ var AdminContainer = React.createClass({displayName: 'admin-container',
                 }
             }.bind(this),
             error: function(xhr, status, err) {
-                this.setState({error: xhr});
+                this.setState({error: xhr.responseText});
                 if(xhr.status == 403) {
                     window.location.replace('adminapi/permission-denied/')
                 }
@@ -71,11 +74,12 @@ var AdminContainer = React.createClass({displayName: 'admin-container',
             }.bind(this),
             cache: false,
             success: function(data) {
-                console.log('Creation of ' + model + ' data successful');
+                console.log('Creation of ' + this.state.model_name + ' data successful');
                 this.retrieveData({request: 'list'});
             }.bind(this),
             error: function(xhr, status, err) {
-                this.setState({error: xhr});
+                console.log(xhr);
+                this.setState({error: xhr.responseText});
             }.bind(this)
         });
     },
@@ -94,11 +98,11 @@ var AdminContainer = React.createClass({displayName: 'admin-container',
             success: function(data) {
                 console.info('Update of ' + this.state.model_name + ' data successful');
                 this.retrieveData({request: 'list'});
-                // Re update form data, to keep form from reverting to previous incoming data
-                this.handleSelect({data});
+                // Re update form data, to keep form from reverting to previous selected data
+                this.handleSelect({data: data});
             }.bind(this),
             error: function(xhr, status, err) {
-                this.setState({error: xhr});
+                this.setState({error: xhr.responseText});
             }.bind(this)
         });
     },
@@ -106,7 +110,7 @@ var AdminContainer = React.createClass({displayName: 'admin-container',
         var model = data['model'];
         var app = data['app'];
         $.ajax({
-            url: this.props.url + this.state.app_label + '/' + this.state.model_label + '/' + data['id'] + '/',
+            url: this.props.url + this.state.app_label + '/' + this.state.model_name + '/' + data['id'] + '/',
             dataType: 'json',
             type: 'DELETE',
             beforeSend: function (xhr) {
@@ -114,11 +118,11 @@ var AdminContainer = React.createClass({displayName: 'admin-container',
             }.bind(this),
             cache: false,
             success: function(data) {
-                console.info('Deletion of ' + model + ' data successful');
+                console.info('Deletion of ' + this.state.model_name + ' data successful');
                 this.retrieveData({request: 'list'});
             }.bind(this),
             error: function(xhr, status, err) {
-                this.setState({error: xhr});
+                this.setState({error: xhr.responseText});
             }.bind(this)
         });
     },
@@ -128,6 +132,7 @@ var AdminContainer = React.createClass({displayName: 'admin-container',
     render: function() {
         return (
             <div>
+                {this.state.error}
                 <Form
                     data={this.state.formData}
                     getModel={this.retrieveData}
@@ -146,9 +151,7 @@ var AdminContainer = React.createClass({displayName: 'admin-container',
         );
     }
 });
-/* Store container elements
 
-*/
 var Form = React.createClass({
     mixins: [React.addons.LinkedStateMixin],
     getInitialState: function() {
@@ -179,58 +182,47 @@ var Form = React.createClass({
     },
     handleCancel: function(e) {
         e.preventDefault();
-        //TODO model_name and app_label to be retrieved in initial retrieve payload
+        /**
+         * Use jQuery to clear form fields
+         * and request empty form data to ensure new item will be created on submit
+        **/
+        $('#form').find('input:text, input:password, input:file, select, textarea, input[type=datetime]').val('');
+        $('#form').find('input:radio, input:checkbox').removeAttr('checked').removeAttr('selected');
         this.props.handleCancel();
     },
     componentWillReceiveProps: function(nextProps) {
         console.log('Props incoming');
-        console.log(nextProps.data.title);
-        /*
-        this.setState(
-           nextProps.data
-        );
-        */
         /**
-         * Set multiselect field values using jQuery so no state data has to be handled.
-         * In the future this will need to programatically check if the field is a multi-elect
+         * Updates pre fill form fields with new incoming values
         **/
-        //$('select[name=sites]').val(nextProps.data.sites);
-        /**
-         * Updates state data with new incoming values
-        **/
-        /**
-         * If the next incoming props is empty, it clears out all the fields except
-         * the site list explicitly.
-        **/
-        /*
-        if (jQuery.isEmptyObject(nextProps.data)) {
-            var clearData = {};
-            for (var field in this.props.data) {
-                clearData[field] = '';
+        for (field in nextProps.data) {
+            if(field == 'image') {
+                continue;
             }
-            this.setState(clearData);
+            if($('[name='+field+']').is(':checkbox')) {
+                $('[name='+field+']').prop( 'checked', nextProps.data[field]);
+            } else {
+                $('[name='+field+']').val(nextProps.data[field]);
+            }
         }
-        */
     },
     componentDidUpdate: function(prevProps, prevState) {
         console.log('Update done');
         if(this.props.modelData != prevProps.modelData || prevProps.modelData.length == 0) {
-            console.log('Did update and modelDatas don not match');
-            //Initial form creation or setup.
+            console.log('Did update and modelDatas do not match');
+            //Initial form creation.
             this.setState({form: formBuilder.assemble(this, this.props.modelData)});
         }
     },
     componentDidMount: function() {
         /**
-         * Use the inner ajax function to hit the api and obtain info on other model dependencies
-         * that are required for fields
+         * Use ajax function to hit the api and obtain model data to build form from
         **/
         console.log('Mounted');
         this.props.getModel({request: 'form'});
     },
     render: function() {
-        console.log(this.props.data.id);
-        return React.DOM.form({ref: 'form', encType: 'multipart/form-data'}, this.state.form);
+        return React.DOM.form({id: 'form', ref: 'form', encType: 'multipart/form-data'}, this.state.form);
     }
 });
 

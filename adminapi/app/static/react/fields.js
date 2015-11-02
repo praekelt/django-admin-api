@@ -4,22 +4,21 @@ var formBuilder = {
         return 'key-' + this.count++;
     },
     assemble: function(context, data) {
-        console.log(context);
         var elements = new Array();
         for (var i = 0; i < data.length; i++) {
+            if(data[i]['name'] == 'id' || data[i]['name'] == 'modelbase_ptr' || data[i]['name'] == 'class_name') {
+                continue;
+            }
             elements.push(React.DOM.div({key: 'div-'+i},
-                React.DOM.label({key: 'element-'+i, name: data[i]['name']}, data[i]['verbose_name']),
+                React.DOM.label({key: 'element-'+i, name: 'label-' + data[i]['name']}, data[i]['verbose_name']),
                 this.elementAssembler(context, data[i]),
                 React.DOM.span({name: 'help'}, data[i]['help_text'])
                 ));
-            //elements.push(React.DOM.label({key: "element-"+i, name: data[i]['name']}, data[i]['verbose_name']));
-            //elements.push(this.elementAssembler(context, data[i]));
-            //elements.push(React.DOM.span({name: 'help'}, data[i]['help_text']));
         }
         elements.push(this.buttons(context));
         return elements;
     },
-    // Currently nont implemented, might not be needed at all
+    // Currently not implemented, might not be needed at all
     /*
     formElement: function(context, elements) {
         attrs = {
@@ -38,11 +37,17 @@ var formBuilder = {
             case 'ImageField':
             case 'DateTimeField':
             case 'SlugField':
+            case 'BooleanField':
+            case 'PositiveIntegerField':
                 element = this.inputElement(context, data);
                 break;
             case 'TextField':
             case 'RichTextField':
                 element = this.textAreaElement(context,data);
+                break;
+            case 'ForeignKey':
+            case 'ManyToMany':
+                element = this.selectElement(context, data);
                 break;
         }
         return element;
@@ -62,14 +67,16 @@ var formBuilder = {
             case 'SlugField':
                 attrs['type'] = 'text';
                 attrs['maxLength'] = data.max_length;
-                attrs['valueLink'] = context.linkState(data['name']);
                 break;
             case 'ImageField':
                 attrs['type'] = 'file';
                 break;
             case 'DateTimeField':
                 attrs['type'] = 'datetime';
-                attrs['valueLink'] = context.linkState(data['name']);
+                break;
+            case 'BooleanField':
+                attrs['type'] = 'checkbox';
+                attrs['value'] = true;
                 break;
         }
         return React.DOM.input(attrs);
@@ -78,7 +85,7 @@ var formBuilder = {
     textAreaElement: function(context, data) {
         var attrs = {
             key: this.keyCount(),
-            valueLink: context.linkState(data.name)
+            name: data.name
         }
         element = React.DOM.textarea(attrs);
         return element;
@@ -91,19 +98,23 @@ var formBuilder = {
             name: data.name
         }
         switch(data['model_name']){
-            //case 'ManyToMany':
-                //attrs['multiselect'] = true;
-                //options = optionElement(data);
-                //break;
-            //case 'ForeignKey':
-                //options = optionElement(data);
-                //break;
+            case 'ManyToMany':
+                attrs['multiselect'] = true;
+                options = this.optionElement(data);
+                break;
+            case 'ForeignKey':
+                options = this.optionElement(data);
+                break;
         }
         return React.DOM.select(attrs, options);
     },
 
     optionElement: function(data) {
         var options = new Array();
+        options.push(React.DOM.option({key: 'none', value: ''}, '--------'));
+        if(!data['choices']) {
+            return options;
+        }
         for (var i = 0; i < data['choices'].length; i++) {
             options.push(React.DOM.option({key: i, value: data['choices'][i][0]}, data['choices'][i][1]));
         }
