@@ -7,42 +7,34 @@
 var AdminContainer = React.createClass({displayName: 'admin-container',
     getInitialState: function() {
         return({
-            dataList: [],
+            model_name: 'post',
+            app_label: 'post',
+            listData: [],
             formData: {},
-            modelData: [{"editable":true,"model_name":"AutoField","name":"id"},{"help_text":"","blank":true,"editable":true,"model_name":"ImageField","name":"image"},{"help_text":"","blank":true,"editable":false,"model_name":"DateTimeField","name":"date_taken"},{"help_text":"","blank":false,"editable":false,"model_name":"PositiveIntegerField","name":"view_count"},{"name":"crop_from","editable":true,"choices":[["top","Top"],["right","Right"],["bottom","Bottom"],["left","Left"],["center","Center (Default)"]],"max_length":10,"blank":true,"help_text":"","model_name":"CharField"},{"help_text":"","blank":true,"editable":true,"model_name":"ForeignKey","name":"effect"},{"name":"state","editable":false,"choices":[["unpublished","Unpublished"],["published","Published"],["staging","Staging"]],"max_length":32,"blank":true,"help_text":"Set the item state. The 'Published' state makes the item visible to the public, 'Unpublished' retracts it and 'Staging' makes the item visible on staging instances.","model_name":"CharField"},{"help_text":"Date and time on which to publish this item (state will change to 'published').","blank":true,"editable":true,"model_name":"DateTimeField","name":"publish_on"},{"help_text":"Date and time on which to retract this item (state will change to 'unpublished').","blank":true,"editable":true,"model_name":"DateTimeField","name":"retract_on"},{"name":"slug","editable":true,"max_length":255,"blank":false,"help_text":"","model_name":"SlugField"},{"name":"title","editable":true,"choices":[],"max_length":200,"blank":false,"help_text":"A short descriptive title.","model_name":"CharField"},{"name":"subtitle","editable":true,"choices":[],"max_length":200,"blank":true,"help_text":"Some titles may be the same and cause confusion in admin UI. A subtitle makes a distinction.","model_name":"CharField"},{"name":"description","editable":true,"max_length":null,"blank":true,"help_text":"A short description. More verbose than the title but limited to one or two sentences.","model_name":"TextField"},{"help_text":"Date and time on which this item was created. This is automatically set on creation, but can be changed subsequently.","blank":true,"editable":true,"model_name":"DateTimeField","name":"created"},{"help_text":"Date and time on which this item was last modified. This is automatically set each time the item is saved.","blank":false,"editable":false,"model_name":"DateTimeField","name":"modified"},{"help_text":"","blank":true,"editable":true,"model_name":"ForeignKey","name":"owner"},{"name":"owner_override","editable":true,"choices":[],"max_length":256,"blank":true,"help_text":"If the author is not a registered user then set it here, eg. Reuters.","model_name":"CharField"},{"help_text":"","blank":false,"editable":false,"model_name":"ForeignKey","name":"content_type"},{"name":"class_name","editable":false,"choices":[],"max_length":32,"blank":false,"help_text":"","model_name":"CharField"},{"help_text":"Primary category for this item. Used to determine the object's absolute/default URL.","blank":true,"editable":true,"model_name":"ForeignKey","name":"primary_category"},{"help_text":"Enable commenting for this item. Comments will not display when disabled.","blank":true,"editable":true,"model_name":"BooleanField","name":"comments_enabled"},{"help_text":"Enable anonymous commenting for this item.","blank":true,"editable":true,"model_name":"BooleanField","name":"anonymous_comments"},{"help_text":"Close commenting for this item. Comments will still display, but users won't be able to add new comments.","blank":true,"editable":true,"model_name":"BooleanField","name":"comments_closed"},{"help_text":"Enable liking for this item. Likes will not display when disabled.","blank":true,"editable":true,"model_name":"BooleanField","name":"likes_enabled"},{"help_text":"Enable anonymous liking for this item.","blank":true,"editable":true,"model_name":"BooleanField","name":"anonymous_likes"},{"help_text":"Close liking for this item. Likes will still display, but users won't be able to add new likes.","blank":true,"editable":true,"model_name":"BooleanField","name":"likes_closed"},{"name":"image_attribution","editable":true,"choices":[],"max_length":256,"blank":true,"help_text":"Attribution for the canonical image, eg. Shutterstock.","model_name":"CharField"},{"help_text":"","blank":false,"editable":false,"model_name":"PositiveIntegerField","name":"comment_count"},{"help_text":"","blank":false,"editable":false,"model_name":"PositiveIntegerField","name":"vote_total"},{"help_text":"","blank":false,"editable":true,"model_name":"OneToOneField","name":"modelbase_ptr"},{"help_text":"","blank":true,"editable":true,"model_name":"RichTextField","name":"content"}],
+            modelData: [],
             error: ''
         });
     },
     handleListState: function(data) {
-        console.log('List state update');
-        switch(data['model']) {
-            case 'post':
-                this.setState({postList: data['data']});
-                break;
-            default:
-                return
-        }
+        this.setState({listData: data['data']});
     },
     handleSelect: function(data) {
         this.setState({formData: data['data']});
     },
-    handleCancel: function(data) {
-        console.log('Cancel');
-        switch(data['model']) {
-            case 'post':
-                this.setState({post: {}});
-                break;
-            default:
-                return
-        }
-    },
     // Make a GET request to model Type of choice and receive list of all objects
     retrieveData: function(data) {
-        var model = data['model'];
-        var app = data['app'];
-
+        console.log(data);
+        var url = new String();
+        var schema = new String();
+        var request = data['request'];
+        if(request == 'list') {
+            url = this.props.url
+        }else{
+            url = '/adminapi/api/v1/';
+            schema = 'schema/'
+        }
         $.ajax({
-            url: this.props.url + app + '/' + model + '/',
+            url: url + this.state.app_label + '/' + this.state.model_name + '/' + schema ,
             dataType: 'json',
             type: 'GET',
             beforeSend: function (xhr) {
@@ -50,7 +42,13 @@ var AdminContainer = React.createClass({displayName: 'admin-container',
             }.bind(this),
             cache: false,
             success: function(data) {
-                this.handleListState({model: model, app: app, data});
+                if(request == 'list') {
+                    this.handleListState({data});
+                    console.log('List Updated');
+                } else {
+                    console.log('Model data updated');
+                    this.setState({modelData: data});
+                }
             }.bind(this),
             error: function(xhr, status, err) {
                 this.setState({error: xhr});
@@ -61,14 +59,8 @@ var AdminContainer = React.createClass({displayName: 'admin-container',
         });
     },
     handleSubmit: function(data) {
-        console.log(data);
-        // TODO temp hardcoded model and app
-        var model = 'post';
-        var app = 'post';
-        //var model = data['model'];
-        //var app = data['app'];
         $.ajax({
-            url: this.props.url + app + '/' + model + '/',
+            url: this.props.url + this.state.app_label + '/' + this.state.model_name + '/',
             dataType: 'json',
             type: 'POST',
             contentType: false,
@@ -80,7 +72,7 @@ var AdminContainer = React.createClass({displayName: 'admin-container',
             cache: false,
             success: function(data) {
                 console.log('Creation of ' + model + ' data successful');
-                this.retrieveData({model: model, app: app});
+                this.retrieveData({request: 'list'});
             }.bind(this),
             error: function(xhr, status, err) {
                 this.setState({error: xhr});
@@ -88,10 +80,8 @@ var AdminContainer = React.createClass({displayName: 'admin-container',
         });
     },
     handleUpdate: function(data) {
-        var model = data['model'];
-        var app = data['app'];
         $.ajax({
-            url: this.props.url + app + '/' + model + '/' + data['id'] + '/',
+            url: this.props.url + this.state.app_label + '/' + this.state.model_name + '/' + data['id'] + '/',
             dataType: 'json',
             type: 'PUT',
             contentType: false,
@@ -102,10 +92,10 @@ var AdminContainer = React.createClass({displayName: 'admin-container',
             }.bind(this),
             cache: false,
             success: function(data) {
-                console.info('Update of ' + model + ' data successful');
-                this.retrieveData({model: model, app: app});
+                console.info('Update of ' + this.state.model_name + ' data successful');
+                this.retrieveData({request: 'list'});
                 // Re update form data, to keep form from reverting to previous incoming data
-                this.handleSelect({model: model, app: app, data});
+                this.handleSelect({data});
             }.bind(this),
             error: function(xhr, status, err) {
                 this.setState({error: xhr});
@@ -116,7 +106,7 @@ var AdminContainer = React.createClass({displayName: 'admin-container',
         var model = data['model'];
         var app = data['app'];
         $.ajax({
-            url: this.props.url + app + '/' + model + '/' + data['id'] + '/',
+            url: this.props.url + this.state.app_label + '/' + this.state.model_label + '/' + data['id'] + '/',
             dataType: 'json',
             type: 'DELETE',
             beforeSend: function (xhr) {
@@ -125,35 +115,44 @@ var AdminContainer = React.createClass({displayName: 'admin-container',
             cache: false,
             success: function(data) {
                 console.info('Deletion of ' + model + ' data successful');
-                this.retrieveData({model: model, app: app});
+                this.retrieveData({request: 'list'});
             }.bind(this),
             error: function(xhr, status, err) {
                 this.setState({error: xhr});
             }.bind(this)
         });
     },
-
+    handleCancel: function() {
+    this.setState({formData: {}});
+    },
     render: function() {
         return (
-            <div className="forms-container">
-                {this.state.error.responseText}
+            <div>
                 <Form
                     data={this.state.formData}
+                    getModel={this.retrieveData}
                     modelData={this.state.modelData}
                     handleSubmit={this.handleSubmit}
                     handleUpdate={this.handleUpdate}
                     handleDelete={this.handleDelete}
                     handleCancel={this.handleCancel}
                 />
+                <List
+                    data={this.state.listData}
+                    getList={this.retrieveData}
+                    handleSelect={this.handleSelect}
+                />
             </div>
         );
     }
 });
+/* Store container elements
 
+*/
 var Form = React.createClass({
     mixins: [React.addons.LinkedStateMixin],
     getInitialState: function() {
-        return {form: React.DOM.div(null, "empty")};
+        return {form: React.DOM.div(null, "empty"), formData: {}};
     },
     handleSubmit: function(e) {
         e.preventDefault();
@@ -162,12 +161,12 @@ var Form = React.createClass({
         if(!this.props.data.id) {
         console.log('Create');
         this.props.handleSubmit(
-            {model: this.props.modelData['model_name'], app: this.props.modelData['app_label'], formData: formData}
+            {formData: formData}
         );
         } else {
         console.log('Update');
         this.props.handleUpdate(
-            {id: this.props.data.id, model: this.props.modelData['model_name'], app: this.props['app_label'], formData: formData}
+            {id: this.props.data.id, formData: formData}
         );
         }
     },
@@ -175,19 +174,22 @@ var Form = React.createClass({
         e.preventDefault();
         console.log('Delete');
         this.props.handleDelete(
-            {model: this.props.modelData['model_name'], app: this.props.modelData['app_label'], id: this.props.data.id}
+            {id: this.props.data.id}
         );
     },
     handleCancel: function(e) {
         e.preventDefault();
-        this.props.handleCancel({model: this.modelData.model_name});
+        //TODO model_name and app_label to be retrieved in initial retrieve payload
+        this.props.handleCancel();
     },
     componentWillReceiveProps: function(nextProps) {
-        if(nextData.modelData != this.props.modelData) {
-            //Initial form creation or setup.
-        }
         console.log('Props incoming');
-        console.log(nextProps.data);
+        console.log(nextProps.data.title);
+        /*
+        this.setState(
+           nextProps.data
+        );
+        */
         /**
          * Set multiselect field values using jQuery so no state data has to be handled.
          * In the future this will need to programatically check if the field is a multi-elect
@@ -196,19 +198,26 @@ var Form = React.createClass({
         /**
          * Updates state data with new incoming values
         **/
-        this.setState(
-           nextProps.data
-        );
         /**
          * If the next incoming props is empty, it clears out all the fields except
          * the site list explicitly.
         **/
+        /*
         if (jQuery.isEmptyObject(nextProps.data)) {
             var clearData = {};
-            for (var field in this.state) {
+            for (var field in this.props.data) {
                 clearData[field] = '';
             }
             this.setState(clearData);
+        }
+        */
+    },
+    componentDidUpdate: function(prevProps, prevState) {
+        console.log('Update done');
+        if(this.props.modelData != prevProps.modelData || prevProps.modelData.length == 0) {
+            console.log('Did update and modelDatas don not match');
+            //Initial form creation or setup.
+            this.setState({form: formBuilder.assemble(this, this.props.modelData)});
         }
     },
     componentDidMount: function() {
@@ -216,41 +225,40 @@ var Form = React.createClass({
          * Use the inner ajax function to hit the api and obtain info on other model dependencies
          * that are required for fields
         **/
-        this.setState({form: formBuilder.assemble(this, this.props.modelData)});
+        console.log('Mounted');
+        this.props.getModel({request: 'form'});
     },
     render: function() {
+        console.log(this.props.data.id);
         return React.DOM.form({ref: 'form', encType: 'multipart/form-data'}, this.state.form);
     }
 });
 
-var PostList = React.createClass({displayName: 'posts-list',
-    getInitialState: function() {
-        return {data: []};
-    },
+var List = React.createClass({displayName: 'list',
     componentWillReceiveProps: function(nextProps) {
         this.setState({data: nextProps.data});
     },
     componentDidMount: function() {
-        this.props.getList({app: 'post', model: 'post'});
+        this.props.getList({request: 'list'});
     },
     handleClick: function(data){
         this.props.handleSelect(data);
     },
     updateList: function() {
-        this.props.getList({app: 'post', model: 'post'})
+        this.props.getList({request: 'list'})
     },
     render: function() {
-        var listItems = this.state.data.map(function (post) {
+        var listItems = this.props.data.map(function (item) {
             return (
-                <Post
-                    key={post.id}
-                    data={post}
-                    handleClick={this.handleClick.bind(this, {data: post, model: 'post' ,app: 'post'})}
+                <Item
+                    key={item.id}
+                    data={item}
+                    handleClick={this.handleClick.bind(this, {data: item})}
                 />
             );
         }.bind(this));
         return(
-            <table className="posts">
+            <table className="items">
                 <tbody>
                     <tr>
                         <th>id</th>
@@ -263,7 +271,7 @@ var PostList = React.createClass({displayName: 'posts-list',
     }
 });
 
-var Post = React.createClass({displayName: 'post',
+var Item = React.createClass({displayName: 'item',
     handleClick: function(e){
         e.preventDefault();
         this.props.handleClick();

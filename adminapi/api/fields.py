@@ -7,6 +7,7 @@ def AutoField(field):
     return {
         "model_name": field.__class__.__name__,
         "name": field.name,
+        "verbose_name": field.verbose_name,
         "editable": field.editable
     }
 
@@ -14,6 +15,7 @@ def CharField(field):
     return {
         "model_name": field.__class__.__name__,
         "name": field.name,
+        "verbose_name": field.verbose_name,
         "max_length": field.max_length,
         "blank": field.blank,
         "choices": field.choices,
@@ -25,6 +27,7 @@ def SlugField(field):
     return {
         "model_name": field.__class__.__name__,
         "name": field.name,
+        "verbose_name": field.verbose_name,
         "max_length": field.max_length,
         "blank": field.blank,
         "help_text": field.help_text,
@@ -35,6 +38,7 @@ def TextField(field):
     return {
         "model_name": field.__class__.__name__,
         "name": field.name,
+        "verbose_name": field.verbose_name,
         "max_length": field.max_length,
         "blank": field.blank,
         "help_text": field.help_text,
@@ -45,6 +49,7 @@ def EmailField(field):
     return {
         "model_name": field.__class__.__name__,
         "name": field.name,
+        "verbose_name": field.verbose_name,
         "blank": field.blank,
         "help_text": field.help_text,
         "editable": field.editable,
@@ -54,6 +59,7 @@ def DateTimeField(field):
     return {
         "model_name": field.__class__.__name__,
         "name": field.name,
+        "verbose_name": field.verbose_name,
         "blank": field.blank,
         "help_text": field.help_text,
         "editable": field.editable,
@@ -63,6 +69,7 @@ def FileField(field):
     return {
         "model_name": field.__class__.__name__,
         "name": field.name,
+        "verbose_name": field.verbose_name,
         "blank": field.blank,
         "help_text": field.help_text,
         "editable": field.editable,
@@ -72,6 +79,7 @@ def ImageField(field):
     return {
         "model_name": field.__class__.__name__,
         "name": field.name,
+        "verbose_name": field.verbose_name,
         "blank": field.blank,
         "help_text": field.help_text,
         "editable": field.editable,
@@ -81,6 +89,7 @@ def PositiveIntegerField(field):
     return {
         "model_name": field.__class__.__name__,
         "name": field.name,
+        "verbose_name": field.verbose_name,
         "blank": field.blank,
         "help_text": field.help_text,
         "editable": field.editable,
@@ -90,6 +99,7 @@ def IntegerField(field):
     return {
         "model_name": field.__class__.__name__,
         "name": field.name,
+        "verbose_name": field.verbose_name,
         "blank": field.blank,
         "help_text": field.help_text,
         "editable": field.editable,
@@ -99,6 +109,7 @@ def BigIntegerField(field):
     return {
         "model_name": field.__class__.__name__,
         "name": field.name,
+        "verbose_name": field.verbose_name,
         "blank": field.blank,
         "help_text": field.help_text,
         "editable": field.editable,
@@ -108,6 +119,7 @@ def ForeignKey(field):
     return{
         "model_name": field.__class__.__name__,
         "name":field.name,
+        "verbose_name": field.verbose_name,
         "blank": field.blank,
         "help_text": field.help_text,
         "editable": field.editable,
@@ -117,6 +129,7 @@ def ManyToManyField(field):
     return {
         "model_name": field.__class__.__name__,
         "name": field.name,
+        "verbose_name": field.verbose_name,
         "blank": field.blank,
         "help_text": field.help_text,
         "editable": field.editable,
@@ -126,6 +139,7 @@ def OneToOneField(field):
     return {
         "model_name": field.__class__.__name__,
         "name": field.name,
+        "verbose_name": field.verbose_name,
         "blank": field.blank,
         "help_text": field.help_text,
         "editable": field.editable,
@@ -135,6 +149,7 @@ def BooleanField(field):
     return {
         "model_name": field.__class__.__name__,
         "name": field.name,
+        "verbose_name": field.verbose_name,
         "blank": field.blank,
         "help_text": field.help_text,
         "editable": field.editable,
@@ -144,6 +159,7 @@ def RichTextField(field):
     return {
         "model_name": field.__class__.__name__,
         "name": field.name,
+        "verbose_name": field.verbose_name,
         "blank": field.blank,
         "help_text": field.help_text,
         "editable": field.editable,
