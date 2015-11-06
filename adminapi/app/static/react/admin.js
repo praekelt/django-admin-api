@@ -120,6 +120,7 @@ var AdminContainer = React.createClass({displayName: 'admin-container',
             success: function(data) {
                 console.info('Deletion of ' + this.state.model_name + ' data successful');
                 this.retrieveData({request: 'list'});
+                this.handleCancel();
             }.bind(this),
             error: function(xhr, status, err) {
                 this.setState({error: xhr.responseText});
@@ -127,11 +128,22 @@ var AdminContainer = React.createClass({displayName: 'admin-container',
         });
     },
     handleCancel: function() {
-    this.setState({formData: {}});
+        /**
+         * Use jQuery to clear form fields
+         * and request empty form data to ensure new item will be created on submit
+        **/
+        $('#form').find('input:text, input:password, input:file, select, textarea, input[type=datetime]').val('');
+        $('#form').find('input:radio, input:checkbox').removeAttr('checked').removeAttr('selected');
+        this.setState({formData: {}});
+    },
+    logOut: function() {
+        Cookies.remove('token');
+        window.location = '/adminapi/app/login/';
     },
     render: function() {
         return (
             <div>
+                <button onClick={this.logOut} title="Log current user out">Log out</button>
                 {this.state.error}
                 <Form
                     data={this.state.formData}
@@ -182,12 +194,6 @@ var Form = React.createClass({
     },
     handleCancel: function(e) {
         e.preventDefault();
-        /**
-         * Use jQuery to clear form fields
-         * and request empty form data to ensure new item will be created on submit
-        **/
-        $('#form').find('input:text, input:password, input:file, select, textarea, input[type=datetime]').val('');
-        $('#form').find('input:radio, input:checkbox').removeAttr('checked').removeAttr('selected');
         this.props.handleCancel();
     },
     componentWillReceiveProps: function(nextProps) {

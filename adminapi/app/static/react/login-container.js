@@ -32,7 +32,6 @@ var LoginContainer = React.createClass({displayName: 'ReactLogin',
                 console.log('state set');
                 Cookies.set('token', data, {expires: 1}, {secure: true});
                 console.log('Cookie data set');
-
                 // Make a GET request to a view that requires auth token header
                 this.testAuthToken(data);
             }.bind(this),

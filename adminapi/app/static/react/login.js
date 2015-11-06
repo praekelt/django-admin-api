@@ -41,7 +41,10 @@ var LoginContainer = React.createClass({displayName: 'ReactLogin',
     },
     render: function() {
         return (
-            <LoginForm onLoginSubmit={ this.handleLoginSubmit } />
+            <div>
+                <h2>Login</h2>
+                <LoginForm onLoginSubmit={ this.handleLoginSubmit } />
+           </div>
         );
     }
 });
