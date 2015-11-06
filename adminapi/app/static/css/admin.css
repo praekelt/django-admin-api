@@ -1,0 +1,69 @@
+body {
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #333;
+}
+
+div {
+    display: block;
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+div#admin {
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+form#form {
+    border: rgb(66, 66, 66);
+    border-style: groove;
+    background: #eee;
+}
+
+#form div {
+    display: block;
+    width: 95%;
+}
+
+#form div label {
+    display: block;
+    padding-top: 7px;
+    text-decoration: underline;
+    text-transform: capitalize;
+}
+
+#form div span {
+    display: block;
+    color: #737373;
+}
+
+#form div input {
+    display: block;
+    width: 80%;
+}
+
+table {
+    width:100%;
+    border:1px solid #000000;
+    border-collapse: collapse;
+}
+
+table th, td {
+    border:1px solid #000000;
+}
+
+button {
+    margin: 15px 20px 15px 20px;
+    background: #AFBDC7;
+    border-radius: 10px;
+    padding: 8px 17px 8px 17px
+}
+button:hover {
+    background: #E8E8E8;
+}
