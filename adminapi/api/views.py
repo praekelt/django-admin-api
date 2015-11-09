@@ -120,12 +120,8 @@ class SchemaView(views.APIView):
                 model=model_name
             ).model_class()
         model_field_data = None
-        #model_field_data = model._meta.fields
-        #model_field_data.extend(model._meta.many_to_many)
         model_field_data = model._meta.many_to_many
         model_field_data.extend(model._meta.fields)
-        #import pdb; pdb.set_trace()
-        print(model._meta.many_to_many)
         li = []
         for field in model_field_data:
             li.append(fields.field_to_dict(field))
