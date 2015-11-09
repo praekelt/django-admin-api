@@ -46,7 +46,7 @@ var formBuilder = {
                 element = this.textAreaElement(context,data);
                 break;
             case 'ForeignKey':
-            case 'ManyToMany':
+            case 'ManyToManyField':
                 element = this.selectElement(context, data);
                 break;
         }
@@ -98,8 +98,8 @@ var formBuilder = {
             name: data.name
         }
         switch(data['model_name']){
-            case 'ManyToMany':
-                attrs['multiselect'] = true;
+            case 'ManyToManyField':
+                attrs['multiple'] = true;
                 options = this.optionElement(data);
                 break;
             case 'ForeignKey':

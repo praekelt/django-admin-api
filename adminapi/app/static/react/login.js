@@ -73,7 +73,7 @@ var LoginForm = React.createClass({displayName: 'LoginForm',
     }
 });
 
-React.render(
+ReactDOM.render(
     React.createElement(LoginContainer,{url: '/adminapi/api/v1/login/'}),
     document.getElementById('login')
 );
