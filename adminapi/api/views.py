@@ -120,7 +120,6 @@ class SchemaView(views.APIView):
                 app_label=app_label,
                 model=model_name
             ).model_class()
-        # import pdb; pdb.set_trace()
         model_field_data = []
         if django.get_version() <= "1.6.8":
             model_field_data = model._meta.many_to_many
