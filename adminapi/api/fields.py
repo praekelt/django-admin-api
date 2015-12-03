@@ -134,6 +134,7 @@ def ManyToManyField(field):
         "blank": field.blank,
         "help_text": field.help_text,
         "editable": field.editable,
+        "choices": field.get_choices(),
     }
 
 def OneToOneField(field):

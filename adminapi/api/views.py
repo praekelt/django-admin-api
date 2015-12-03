@@ -1,3 +1,4 @@
+import django
 from django.contrib.auth.models import User
 from django.contrib.contenttypes import models
 from django.core import exceptions, serializers
@@ -119,9 +120,13 @@ class SchemaView(views.APIView):
                 app_label=app_label,
                 model=model_name
             ).model_class()
-        model_field_data = None
-        model_field_data = model._meta.many_to_many
-        model_field_data.extend(model._meta.fields)
+        # import pdb; pdb.set_trace()
+        model_field_data = []
+        if django.get_version() <= "1.6.8":
+            model_field_data = model._meta.many_to_many
+            model_field_data.extend(model._meta.fields)
+        else:
+            model_field_data.extend(model._meta.fields)
         li = []
         for field in model_field_data:
             li.append(fields.field_to_dict(field))

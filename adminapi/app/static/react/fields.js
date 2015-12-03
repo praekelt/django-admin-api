@@ -111,8 +111,8 @@ var formBuilder = {
 
     optionElement: function(data) {
         var options = new Array();
-        options.push(React.DOM.option({key: 'none', value: ''}, '--------'));
         if(!data['choices']) {
+            options.push(React.DOM.option({key: 'none', value: ''}, '--------'));
             return options;
         }
         for (var i = 0; i < data['choices'].length; i++) {
